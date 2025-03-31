@@ -19,25 +19,48 @@ public class VideoGameService {
         return videoGameRepository.findAll();
     }
 
-    public void createVideoGame(VideoGame videoGame) {
-        videoGameRepository.save(videoGame);
+    public void addVideoGame(VideoGame videoGame) {
+        VideoGame existingVideoGame = videoGameRepository.findById(videoGame.getId())
+              .orElse(null);
+        if (existingVideoGame == null)
+        {
+            videoGameRepository.save(existingVideoGame);
+        }
+        else 
+        {
+            throw new RuntimeException("Video game already exists!");
+        }
     }
 
-    public void updateVideoGame(long id, VideoGame videoGame) {
-        VideoGame updateVideoGame = videoGameRepository.findById(id).get();
-        // update video game logic
-        updateVideoGame.setTitle(videoGame.getTitle());
-        updateVideoGame.setGenre(videoGame.getGenre());
-        updateVideoGame.setDevelopers(videoGame.getDevelopers());
-        updateVideoGame.setPlatforms(videoGame.getPlatforms());
-        updateVideoGame.setGameModes(videoGame.getGameModes());
-        updateVideoGame.setAverageRating(videoGame.getAverageRating());
-        updateVideoGame.setReviews(videoGame.getReviews());
-        videoGameRepository.save(updateVideoGame);
+    public void updateVideoGame(VideoGame videoGame) {
+        VideoGame existingVideoGame = videoGameRepository.findById(videoGame.getId()).orElse(null);
+        if (existingVideoGame == null) 
+        {
+            throw new RuntimeException("Video game does not exist!");
+        }
+        else 
+        {
+            // update video game logic
+            existingVideoGame.setTitle(videoGame.getTitle());
+            existingVideoGame.setGenre(videoGame.getGenre());
+            existingVideoGame.setDevelopers(videoGame.getDevelopers());
+            existingVideoGame.setPlatforms(videoGame.getPlatforms());
+            existingVideoGame.setGameModes(videoGame.getGameModes());
+            existingVideoGame.setAverageRating(videoGame.getAverageRating());
+            existingVideoGame.setReviews(videoGame.getReviews());
+            videoGameRepository.save(existingVideoGame);
+        }
     }
 
-    public void deleteVideoGame(long id) {
-        VideoGame deleteVideoGame = videoGameRepository.findById(id).get();
-        videoGameRepository.delete(deleteVideoGame);
+    public void deleteVideoGame(VideoGame videoGame) {
+        VideoGame existingVideoGame = videoGameRepository.findById(videoGame.getId()).orElse(null);
+        if (existingVideoGame == null) 
+        {
+            throw new RuntimeException("Video game does not exist!");
+        }
+        else 
+        {
+            videoGameRepository.delete(existingVideoGame);
+        }
     }
 }

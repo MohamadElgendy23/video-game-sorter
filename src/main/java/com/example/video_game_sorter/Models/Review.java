@@ -31,6 +31,12 @@ public class Review {
       private VideoGame videoGame;    
 
       // Getter and setter methods
+      public long getId() {
+        return id;
+      }
+      public void setId(long id) {
+        this.id = id;
+      }
       public String getReviewerName() {
           return reviewerName;
       }
@@ -48,6 +54,12 @@ public class Review {
       }
       public void setComment(String comment) {
           this.comment = comment;
+      }
+      public VideoGame getVideoGame() {
+        return videoGame;
+      }
+      public void setVideoGame(VideoGame videoGame) {
+        this.videoGame = videoGame;
       }
   }
     

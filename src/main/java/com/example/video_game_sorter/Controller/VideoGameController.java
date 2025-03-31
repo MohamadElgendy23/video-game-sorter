@@ -26,21 +26,21 @@ public class VideoGameController {
         return videoGameService.getVideoGames();
     }
 
-    @PostMapping(value="/createVideoGame")
-    public String createVideoGame(@RequestBody VideoGame videoGame) {
-        videoGameService.createVideoGame(videoGame);
-        return "Created video game successfully....";
+    @PostMapping(value="/addVideoGame")
+    public String addVideoGame(@RequestBody VideoGame videoGame) {
+        videoGameService.addVideoGame(videoGame);
+        return "Added video game successfully....";
     }
 
-    @PutMapping(value="/updateVideoGame/{id}")
-    public String updateVideoGame(@PathVariable long id, @PathVariable  @RequestBody VideoGame videoGame) {
-        videoGameService.updateVideoGame(id, videoGame);
+    @PutMapping(value="/updateVideoGame")
+    public String updateVideoGame(@RequestBody VideoGame videoGame) {
+        videoGameService.updateVideoGame(videoGame);
         return "Updated video game successfully....";
     }
 
-    @DeleteMapping(value="/deleteVideoGame/{id}")
-    public String deleteVideoGame(@PathVariable long id) {
-        videoGameService.deleteVideoGame(id);
+    @DeleteMapping(value="/deleteVideoGame")
+    public String deleteVideoGame(@RequestBody VideoGame videoGame) {
+        videoGameService.deleteVideoGame(videoGame);
         return "Deleted video game successfully....";
     }
 
