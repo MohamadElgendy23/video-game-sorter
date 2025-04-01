@@ -3,6 +3,7 @@ package com.example.video_game_sorter.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,17 @@ public class ReviewService {
     private ReviewRepo reviewRepository;
 
     public List<Review> getReviews(long id) {
-        return reviewRepository.findAll(review -> review.getVideoGame().getId() == id);
+        List<Review> filteredReviews = reviewRepository.findAll().stream().filter(review -> review.getVideoGame().getId() == id).collect(Collectors.toList());;
+        
+        if (filteredReviews.isEmpty())
+        {
+            throw new RuntimeException("No Reviews!");
+        }
+        else 
+        {
+            return filteredReviews;
+        }
+
     }
 
     public void addReview(Review review) {
