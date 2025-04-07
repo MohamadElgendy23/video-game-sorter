@@ -1,7 +1,5 @@
 package com.example.video_game_sorter.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +17,8 @@ public class ReviewService {
     private ReviewRepo reviewRepository;
 
     public List<Review> getReviews(long id) {
+        
+        // filter reviews based on video game id
         List<Review> filteredReviews = reviewRepository.findAll().stream().filter(review -> review.getVideoGame().getId() == id).collect(Collectors.toList());;
         
         if (filteredReviews.isEmpty())
@@ -29,7 +29,6 @@ public class ReviewService {
         {
             return filteredReviews;
         }
-
     }
 
     public void addReview(Review review) {

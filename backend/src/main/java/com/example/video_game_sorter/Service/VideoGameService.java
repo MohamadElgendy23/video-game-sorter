@@ -16,7 +16,16 @@ public class VideoGameService {
     private VideoGameRepo videoGameRepository;
     
     public List<VideoGame> getVideoGames() {
-        return videoGameRepository.findAll();
+        List<VideoGame> existingVideoGames = videoGameRepository.findAll();
+        
+        if (existingVideoGames.isEmpty())
+        {
+            throw new RuntimeException("No video games!");
+        }
+        else 
+        {
+            return existingVideoGames;
+        }
     }
 
     public void addVideoGame(VideoGame videoGame) {

@@ -1,6 +1,5 @@
 package com.example.video_game_sorter.Controller;
 
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +10,6 @@ import com.example.video_game_sorter.Models.VideoGame;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 
 // This class represents the video game controller; ie. the routes for a video game
@@ -22,26 +20,27 @@ public class VideoGameController {
     private VideoGameService videoGameService;
 
     @GetMapping(value="/videogames")
-    public List<VideoGame> getVideoGames() {
-        return videoGameService.getVideoGames();
+    public String getVideoGames() {
+        videoGameService.getVideoGames();
+        return "Fetched video games successfully...";
     }
 
     @PostMapping(value="/addVideoGame")
     public String addVideoGame(@RequestBody VideoGame videoGame) {
         videoGameService.addVideoGame(videoGame);
-        return "Added video game successfully....";
+        return "Added video game successfully...";
     }
 
     @PutMapping(value="/updateVideoGame")
     public String updateVideoGame(@RequestBody VideoGame videoGame) {
         videoGameService.updateVideoGame(videoGame);
-        return "Updated video game successfully....";
+        return "Updated video game successfully...";
     }
 
     @DeleteMapping(value="/deleteVideoGame")
     public String deleteVideoGame(@RequestBody VideoGame videoGame) {
         videoGameService.deleteVideoGame(videoGame);
-        return "Deleted video game successfully....";
+        return "Deleted video game successfully...";
     }
 
 }
