@@ -1,4 +1,4 @@
-package com.example.video_game_sorter.Service;
+package com.example.video_game_sorter.Services;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,11 +32,14 @@ public class ReviewService {
     }
 
     public void addReview(Review review) {
+        // Check if the review already exists by ID
         Review existingReview = reviewRepository.findById(review.getId())
               .orElse(null);
+
+        // If no review exists with the same ID, save the new review
         if (existingReview == null)
         {
-            reviewRepository.save(existingReview);
+            reviewRepository.save(review);
         }
         else 
         {

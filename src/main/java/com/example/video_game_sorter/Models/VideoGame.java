@@ -57,7 +57,7 @@ public class VideoGame {
     @Column
     private double averageRating; 
     
-    @OneToMany(mappedBy = "video_game_id", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "videoGame", cascade = CascadeType.ALL, orphanRemoval = true)
     private ArrayList<Review> reviews;     
 
     // Getter and setter methods

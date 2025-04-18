@@ -1,4 +1,4 @@
-package com.example.video_game_sorter.Service;
+package com.example.video_game_sorter.Services;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class VideoGameService {
               .orElse(null);
         if (existingVideoGame == null)
         {
-            videoGameRepository.save(existingVideoGame);
+            videoGameRepository.save(videoGame);
         }
         else 
         {
