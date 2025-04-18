@@ -37,8 +37,8 @@ public class VideoGameController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateVideoGame(@PathVariable Long id, @RequestBody VideoGame updatedGame) {
-        videoGameService.updateVideoGame(id, updatedGame);
+    public ResponseEntity<String> updateVideoGame(@PathVariable Long id, @RequestBody VideoGame videoGame) {
+        videoGameService.updateVideoGame(id, videoGame);
         return ResponseEntity.ok("Video game updated successfully.");
     }
 

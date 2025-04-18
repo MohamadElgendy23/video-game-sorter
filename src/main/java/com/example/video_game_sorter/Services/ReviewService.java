@@ -1,7 +1,6 @@
 package com.example.video_game_sorter.Services;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,11 +20,9 @@ public class ReviewService {
     public List<Review> getReviews(Long videoGameId) {
         
         // filter reviews based on video game id
-        List<Review> filteredReviews = reviewRepository.findAll().stream().filter(review -> review.getVideoGame().getId() == videoGameId).collect(Collectors.toList());;
-        
-        if (filteredReviews.isEmpty())
-        {
-            throw new RuntimeException("No Reviews!");
+        List<Review> filteredReviews = reviewRepository.findByVideoGameId(videoGameId);
+        if (filteredReviews.isEmpty()){
+            throw new ReviewNotFoundException("No reviews for this video game found!");
         }
         else 
         {

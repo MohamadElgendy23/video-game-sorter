@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
-
 // This class represents the review controller; ie. the routes for a review
 @RestController
 @RequestMapping(value="/api/reviews")
@@ -38,13 +37,13 @@ public class ReviewController {
 
     @PutMapping(value="/{id}")
     public ResponseEntity<String> updateReview(@PathVariable Long id, @RequestBody Review review) {
-        reviewService.updateReview(review);
+        reviewService.updateReview(id, review);
         return ResponseEntity.ok("Review updated successfully.");
     }
 
     @DeleteMapping(value="/{id}")
-    public ResponseEntity<String> deleteReview(@RequestBody Review review) {
-        reviewService.deleteReview(review);
+    public ResponseEntity<String> deleteReview(@PathVariable Long id) {
+        reviewService.deleteReview(id);
         return ResponseEntity.ok("Review deleted successfully.");
     }
     
