@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 // This class represents the review controller; ie. the routes for a review
 @RestController
 @RequestMapping(value="/api/reviews")
-@CrossOrigin(origins="http://localhost:3000")
+@CrossOrigin(origins="http://localhost:5173/")
 public class ReviewController {
     
     @Autowired

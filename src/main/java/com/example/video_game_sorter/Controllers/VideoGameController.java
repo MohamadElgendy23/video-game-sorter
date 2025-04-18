@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 // This class represents the video game controller; ie. the routes for a video game
 @RestController
 @RequestMapping("/api/videogames")
-@CrossOrigin(origins="http://localhost:3000")
+@CrossOrigin(origins="http://localhost:5173/")
 public class VideoGameController {
     
     @Autowired
