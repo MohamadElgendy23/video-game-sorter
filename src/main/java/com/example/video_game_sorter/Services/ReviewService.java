@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.video_game_sorter.Exceptions.Review.ReviewAlreadyExistsException;
+import com.example.video_game_sorter.Exceptions.Review.ReviewNotFoundException;
 import com.example.video_game_sorter.Models.Review;
 import com.example.video_game_sorter.Repo.ReviewRepo;
 
@@ -16,10 +18,10 @@ public class ReviewService {
     @Autowired
     private ReviewRepo reviewRepository;
 
-    public List<Review> getReviews(long id) {
+    public List<Review> getReviews(Long videoGameId) {
         
         // filter reviews based on video game id
-        List<Review> filteredReviews = reviewRepository.findAll().stream().filter(review -> review.getVideoGame().getId() == id).collect(Collectors.toList());;
+        List<Review> filteredReviews = reviewRepository.findAll().stream().filter(review -> review.getVideoGame().getId() == videoGameId).collect(Collectors.toList());;
         
         if (filteredReviews.isEmpty())
         {
@@ -32,48 +34,29 @@ public class ReviewService {
     }
 
     public void addReview(Review review) {
-        // Check if the review already exists by ID
-        Review existingReview = reviewRepository.findById(review.getId())
-              .orElse(null);
-
-        // If no review exists with the same ID, save the new review
-        if (existingReview == null)
-        {
-            reviewRepository.save(review);
+        if (reviewRepository.existsById(review.getId())) {
+            throw new ReviewAlreadyExistsException("Review already exists!");
         }
-        else 
-        {
-            throw new RuntimeException("Review already exists!");
-        }
+        reviewRepository.save(review);
     }
 
-    public void updateReview(Review review) {
-        Review existingReview = reviewRepository.findById(review.getId()).orElse(null);
-        if (existingReview == null)
-        {
-            throw new RuntimeException("Review does not exist!");
-        }
-        else 
-        {
-            // update review logic
-            existingReview.setReviewerName(review.getReviewerName());
-            existingReview.setRating(review.getRating());
-            existingReview.setComment(review.getComment());
-            existingReview.setVideoGame(review.getVideoGame());
-            reviewRepository.save(existingReview);
-        }
+    public void updateReview(Long id, Review review) {
+        Review existingReview = reviewRepository.findById(id)
+            .orElseThrow(() -> new ReviewNotFoundException("Review not found for id: " + id));
+        
+        // update review logic
+        existingReview.setReviewerName(review.getReviewerName());
+        existingReview.setRating(review.getRating());
+        existingReview.setComment(review.getComment());
+        existingReview.setVideoGame(review.getVideoGame());
+        reviewRepository.save(existingReview);
     }
 
-    public void deleteReview(Review review) {
-        Review existingReview = reviewRepository.findById(review.getId()).orElse(null);
-        if (existingReview == null) 
-        {
-            throw new RuntimeException("Review does not exist!");
-        }
-        else 
-        {
-            reviewRepository.delete(existingReview);
-        }
+    public void deleteReview(Long id) {
+        Review existingReview = reviewRepository.findById(id)
+        .orElseThrow(() -> new ReviewNotFoundException("Review not found for id: " + id));
+
+        reviewRepository.delete(existingReview);
     }
 
 
