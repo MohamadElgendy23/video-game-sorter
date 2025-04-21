@@ -25,6 +25,13 @@ public class VideoGameService {
         return existingVideoGames;
     }
 
+    public VideoGame getVideoGame(Long id) {
+        VideoGame existingVideoGame = videoGameRepository.findById(id)
+        .orElseThrow(() -> new VideoGameNotFoundException("Video game not found for id: " + id));
+
+        return existingVideoGame;
+    }
+
     public void addVideoGame(VideoGame videoGame) {
         if (videoGameRepository.existsById(videoGame.getId())) {
             throw new VideoGameAlreadyExistsException("Video game already exists!");

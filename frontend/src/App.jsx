@@ -1,13 +1,19 @@
 import "./App.css";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import GameDetail from "./pages/GameDetail";
 
 function App() {
   return (
-    <div className="flex flex-col items-center w-full h-screen">
-      <h1 className="text-7xl text-white mt-7">Video Game Sorter</h1>
-      <p className="text-3xl text-white mt-4">
-        Sort video games by different categories of your choosing
-      </p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />}>
+          <Route index element={<Home />} />
+          <Route path="games" element={<Games />} />
+          <Route path="games/:id" element={<GameDetail />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

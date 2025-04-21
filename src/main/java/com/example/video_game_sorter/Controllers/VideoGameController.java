@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 // This class represents the video game controller; ie. the routes for a video game
@@ -30,6 +32,11 @@ public class VideoGameController {
     @GetMapping
     public List<VideoGame> getAllVideoGames() {
         return videoGameService.getVideoGames();
+    }
+
+    @GetMapping("/{id}")
+    public VideoGame getVideoGame(@PathVariable Long id) {
+       return videoGameService.getVideoGame(id);
     }
 
     @PostMapping
