@@ -8,11 +8,9 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />}>
-          <Route index element={<Home />} />
-          <Route path="games" element={<Games />} />
-          <Route path="games/:id" element={<GameDetail />} />
-        </Route>
+        <Route path="/" element={<Home />} />
+        <Route path="/games" element={<Games />} />
+        <Route path="/games/:id" element={<GameDetail />} />
       </Routes>
     </BrowserRouter>
   );

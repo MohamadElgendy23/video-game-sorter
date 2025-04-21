@@ -1,4 +1,7 @@
+html,
+body,
 #root {
+  height: 100%;
   background-image: url("https://img.freepik.com/free-vector/neon-grid-background_53876-91657.jpg?semt=ais_hybrid&w=740");
   background-color: black;
   background-size: cover;
