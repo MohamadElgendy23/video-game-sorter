@@ -14,7 +14,7 @@ function Home() {
       </p>
       <button
         onClick={() => navigate("/games")}
-        className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 mt-7 rounded-2xl shadow-lg text-lg transition-all"
+        className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 mt-7 rounded-2xl shadow-lg text-lg cursor-pointer transition-all"
       >
         View All Games
       </button>

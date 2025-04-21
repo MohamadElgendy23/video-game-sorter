@@ -1,6 +1,6 @@
 // this file contains data for the frontend (i.e. arrays)
 
-const categories = [
+export const genres = [
   "All",
   "Puzzle",
   "Adventure",
@@ -17,6 +17,4 @@ const categories = [
   "Horror",
 ];
 
-const platforms = ["All", "PC", "PS5", "Xbox", "Switch", "Browser"];
-
-export { categories, platforms };
+export const platforms = ["All", "PC", "PS5", "Xbox", "Switch", "Browser"];
