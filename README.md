@@ -1,8 +1,8 @@
 # Video Game Sorter
 
 🔧 Tech Stack
-Frontend: React + Vite + TailwindCSS
 
+Frontend: React + Vite + TailwindCSS
 Backend: Spring Boot
 
 Database: PostgreSQL
