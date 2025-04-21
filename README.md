@@ -5,7 +5,7 @@
 Frontend: React + Vite + TailwindCSS
 
 
-Backend: Spring Boot
+Backend: Spring Boot + Java
 
 Database: PostgreSQL
 
