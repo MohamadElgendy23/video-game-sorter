@@ -5,13 +5,27 @@ function AddGame() {
   const [title, setTitle] = useState("");
   const [genre, setGenre] = useState("");
   const [developers, setDevelopers] = useState("");
-  const [platforms, setPlatforms] = useState("");
-  const [gameModes, setGameModes] = useState("");
+  const [platforms, setPlatforms] = useState([]);
+  const [gameModes, setGameModes] = useState([]);
   const [releaseYear, setReleaseYear] = useState("2016");
   const [averageRating, setAverageRating] = useState("1");
   const [reviews, setReviews] = useState("");
 
   const [loading, setLoading] = useState(false);
+
+  function handlePlatformsChange(event) {
+    const selectedPlatforms = Array.from(event.target.selectedOptions).map(
+      (selectedOption) => selectedOption.value
+    );
+    setPlatforms(selectedPlatforms);
+  }
+
+  function handleGameModesChange(event) {
+    const selectedGameModes = Array.from(event.target.selectedOptions).map(
+      (selectedOption) => selectedOption.value
+    );
+    setGameModes(selectedGameModes);
+  }
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -21,7 +35,7 @@ function AddGame() {
       title,
       genre,
       developers: developers.split(",").map((developer) => developer.trim()),
-      platforms: platforms.split(),
+      platforms,
       gameModes,
       releaseYear: parseInt(releaseYear),
       averageRating: parseFloat(averageRating),
@@ -31,6 +45,9 @@ function AddGame() {
     setLoading(true);
     await addVideoGame(videoGameFormData);
     setLoading(false);
+
+    // clear when complete
+    clearFormFields();
   }
 
   // function to clear the form fields
@@ -54,7 +71,7 @@ function AddGame() {
         <div>
           <label
             htmlFor="title"
-            className="block text-sm font-extrabold text-gray-700"
+            className="block text-sm font-extrabold text-gray-700 text-center lg:text-start"
           >
             Game Title
           </label>
@@ -72,7 +89,7 @@ function AddGame() {
         <div>
           <label
             htmlFor="genre"
-            className="block text-sm font-extrabold text-gray-700"
+            className="block text-sm font-extrabold text-gray-700 text-center lg:text-start"
           >
             Genre
           </label>
@@ -104,7 +121,7 @@ function AddGame() {
         <div>
           <label
             htmlFor="developers"
-            className="block text-sm font-extrabold text-gray-700"
+            className="block text-sm font-extrabold text-gray-700 text-center lg:text-start"
           >
             Developers
           </label>
@@ -123,7 +140,7 @@ function AddGame() {
         <div>
           <label
             htmlFor="platforms"
-            className="block text-sm font-extrabold text-gray-700"
+            className="block text-sm font-extrabold text-gray-700 text-center lg:text-start"
           >
             Platforms
           </label>
@@ -134,7 +151,7 @@ function AddGame() {
             className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
             required
             value={platforms}
-            onChange={(e) => setPlatforms(e.target.value)}
+            onChange={(e) => handlePlatformsChange(e)}
           >
             <option value="PC">PC</option>
             <option value="PS5">PS5</option>
@@ -147,7 +164,7 @@ function AddGame() {
         <div>
           <label
             htmlFor="gameModes"
-            className="block text-sm font-extrabold text-gray-700"
+            className="block text-sm font-extrabold text-gray-700 text-center lg:text-start"
           >
             Game Modes
           </label>
@@ -158,7 +175,7 @@ function AddGame() {
             className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
             required
             value={gameModes}
-            onChange={(e) => setGameModes(e.target.value)}
+            onChange={(e) => handleGameModesChange(e)}
           >
             <option value="Single-player">Single-player</option>
             <option value="Multiplayer">Multiplayer</option>
@@ -176,7 +193,7 @@ function AddGame() {
         <div>
           <label
             htmlFor="releaseYear"
-            className="block text-sm font-extrabold text-gray-700"
+            className="block text-sm font-extrabold text-gray-700 text-center lg:text-start"
           >
             Release Year
           </label>
@@ -196,7 +213,7 @@ function AddGame() {
         <div>
           <label
             htmlFor="averageRating"
-            className="block text-sm font-extrabold text-gray-700"
+            className="block text-sm font-extrabold text-gray-700 text-center lg:text-start"
           >
             Average Rating (out of 5)
           </label>
@@ -216,7 +233,7 @@ function AddGame() {
         <div>
           <label
             htmlFor="reviews"
-            className="block text-sm font-extrabold text-gray-700"
+            className="block text-sm font-extrabold text-gray-700 text-center lg:text-start"
           >
             Reviews
           </label>
@@ -224,7 +241,7 @@ function AddGame() {
             id="reviews"
             name="reviews"
             rows="4"
-            class="mt-1 block w-full p-3 border border-gray-300 rounded-md"
+            className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
             placeholder="Write your review here"
             required
             value={reviews}
