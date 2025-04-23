@@ -4,14 +4,21 @@ import { genres, platforms } from "../data/data.js";
 import { getVideoGames, getVideoGame } from "../api/api.js";
 
 function Games() {
+  const [loading, setLoading] = useState(true);
   const [games, setGames] = useState([]);
-  const [activeFilter, setActiveFilter] = useState("all");
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [activePlatform, setActivePlatform] = useState("All");
   const navigate = useNavigate();
 
   useEffect(() => {
-    getVideoGames().then((videoGames) => {
-      setGames(videoGames);
-    });
+    setLoading(true);
+    getVideoGames()
+      .then((videoGames) => {
+        setGames(videoGames);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   return (
@@ -19,13 +26,21 @@ function Games() {
       <h2 className="text-5xl font-bold text-white text-center mb-7">
         Browse Games by Category
       </h2>
+      <div className="text-center mb-7">
+        <button
+          className="bg-indigo-600 text-white px-6 py-3 rounded-full shadow-md hover:bg-indigo-700 cursor-pointer focus:outline-none transition duration-300"
+          onClick={() => navigate("/games/new")}
+        >
+          Add A Game
+        </button>
+      </div>
 
       {/* Genres filter */}
       <div className="flex justify-center gap-4 mb-6">
         {genres.map((genre) => (
           <button
             key={genre}
-            className={`border border-gray-300 text-lg px-4 py-2 rounded hover:bg-indigo-100 cursor-pointer ${activeFilter === genre ? "bg-indigo-600 text-white" : "bg-white text-black"}`}
+            className={`border border-gray-300 text-lg px-4 py-2 rounded cursor-pointer ${activeFilter === genre ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-white text-black hover:bg-indigo-100"}`}
             onClick={() => setActiveFilter(genre)}
           >
             {genre}
@@ -33,7 +48,24 @@ function Games() {
         ))}
       </div>
 
-      {games && games.length > 0 ? (
+      {/* Platforms filter */}
+      <div className="flex justify-center gap-4 flex-wrap mb-6">
+        {platforms.map((platform) => (
+          <button
+            key={platform}
+            className={`border border-gray-300 text-lg px-4 py-2 rounded cursor-pointer ${activePlatform === platform ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-white text-black hover:bg-indigo-100"}`}
+            onClick={() => setActivePlatform(platform)}
+          >
+            {platform}
+          </button>
+        ))}
+      </div>
+
+      {loading ? (
+        <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-64">
+          <div className="w-16 h-16 border-4 border-indigo-300 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      ) : games && games.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {games.map((game) => (
             <div key={game.id} className="bg-white shadow-md p-4 rounded-lg">
