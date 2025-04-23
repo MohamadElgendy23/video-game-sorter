@@ -11,7 +11,30 @@ function AddGame() {
   const [averageRating, setAverageRating] = useState("1");
   const [reviews, setReviews] = useState("");
 
-  function handleCancel() {
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    // Construct form data to be submitted
+    const videoGameFormData = {
+      title,
+      genre,
+      developers: developers.split(",").map((developer) => developer.trim()),
+      platforms: platforms.split(),
+      gameModes,
+      releaseYear: parseInt(releaseYear),
+      averageRating: parseFloat(averageRating),
+      reviews,
+    };
+
+    setLoading(true);
+    await addVideoGame(videoGameFormData);
+    setLoading(false);
+  }
+
+  // function to clear the form fields
+  function clearFormFields() {
     setTitle("");
     setGenre("");
     setDevelopers("");
@@ -57,6 +80,7 @@ function AddGame() {
             id="genre"
             name="genre"
             className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
+            required
             value={genre}
             onChange={(e) => setGenre(e.target.value)}
           >
@@ -89,6 +113,7 @@ function AddGame() {
             id="developers"
             name="developers"
             className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
+            required
             placeholder="Enter developer names, separated by commas"
             value={developers}
             onChange={(e) => setDevelopers(e.target.value)}
@@ -107,6 +132,7 @@ function AddGame() {
             name="platforms"
             multiple
             className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
+            required
             value={platforms}
             onChange={(e) => setPlatforms(e.target.value)}
           >
@@ -130,6 +156,7 @@ function AddGame() {
             name="gameModes"
             multiple
             className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
+            required
             value={gameModes}
             onChange={(e) => setGameModes(e.target.value)}
           >
@@ -208,14 +235,16 @@ function AddGame() {
         <div className="flex justify-between mt-6">
           <button
             type="submit"
+            disabled={loading}
             className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer"
+            onClick={(e) => handleSubmit(e)}
           >
-            Save Game
+            {loading ? "Saving..." : "Save Game"}
           </button>
           <button
             type="button"
             className="px-6 py-3 bg-gray-500 text-white rounded-md hover:bg-gray-600 cursor-pointer"
-            onClick={handleCancel}
+            onClick={clearFormFields}
           >
             Cancel
           </button>
