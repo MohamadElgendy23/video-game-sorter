@@ -6,8 +6,8 @@ import { getVideoGames, getVideoGame } from "../api/api.js";
 function Games() {
   const [loading, setLoading] = useState(true);
   const [games, setGames] = useState([]);
-  const [activeFilter, setActiveFilter] = useState("All");
-  const [activePlatform, setActivePlatform] = useState("All");
+  const [activeGenre, setActiveGenre] = useState(["All"]);
+  const [activePlatform, setActivePlatform] = useState(["All"]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,26 +38,34 @@ function Games() {
       {/* Genres filter */}
       <div className="flex justify-center gap-4 mb-6">
         {genres.map((genre) => (
-          <button
-            key={genre}
-            className={`border border-gray-300 text-lg px-4 py-2 rounded cursor-pointer ${activeFilter === genre ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-white text-black hover:bg-indigo-100"}`}
-            onClick={() => setActiveFilter(genre)}
+          <label
+            className={`border border-gray-300 text-lg px-4 py-2 rounded cursor-pointer ${activeGenre.includes(genre) ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-white text-black hover:bg-indigo-100"}`}
           >
             {genre}
-          </button>
+            <input
+              key={genre}
+              type="checkbox"
+              className="hidden"
+              onClick={() => setActiveGenre((prev) => [...prev, genre])}
+            />
+          </label>
         ))}
       </div>
 
       {/* Platforms filter */}
       <div className="flex justify-center gap-4 flex-wrap mb-6">
         {platforms.map((platform) => (
-          <button
-            key={platform}
-            className={`border border-gray-300 text-lg px-4 py-2 rounded cursor-pointer ${activePlatform === platform ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-white text-black hover:bg-indigo-100"}`}
-            onClick={() => setActivePlatform(platform)}
+          <label
+            className={`border border-gray-300 text-lg px-4 py-2 rounded cursor-pointer ${activePlatform.includes(platform) ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-white text-black hover:bg-indigo-100"}`}
           >
             {platform}
-          </button>
+            <input
+              key={platform}
+              type="checkbox"
+              className="hidden"
+              onClick={() => setActivePlatform((prev) => [...prev, platform])}
+            ></input>
+          </label>
         ))}
       </div>
 
@@ -68,7 +76,11 @@ function Games() {
       ) : games && games.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {games.map((game) => (
-            <div key={game.id} className="bg-white shadow-md p-4 rounded-lg">
+            <div
+              key={game.id}
+              className="bg-white shadow-md p-4 rounded-lg cursor-pointer"
+              onClick={() => navigate(`/games/${game.id}`)}
+            >
               <h3 className="text-xl font-semibold">{game.title}</h3>
               <p className="text-sm text-gray-600">{game.genre}</p>
               <p className="text-sm text-gray-600">{game.releaseYear}</p>
