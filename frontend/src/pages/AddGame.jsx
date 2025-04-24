@@ -8,8 +8,13 @@ function AddGame() {
   const [platforms, setPlatforms] = useState([]);
   const [gameModes, setGameModes] = useState([]);
   const [releaseYear, setReleaseYear] = useState("2016");
-  const [averageRating, setAverageRating] = useState("1");
-  const [reviews, setReviews] = useState("");
+  const [averageRating, setAverageRating] = useState(0);
+  const [reviews, setReviews] = useState([]);
+  const [newReview, setNewReview] = useState({
+    reviewerName: "",
+    rating: "1",
+    comment: "",
+  });
 
   const [loading, setLoading] = useState(false);
 
@@ -27,8 +32,38 @@ function AddGame() {
     setGameModes(selectedGameModes);
   }
 
+  function handleNewReviewChange(event) {
+    const { name, value } = event.target;
+    setNewReview((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+
+  function handleSaveReview() {
+    if (!newReview.reviewerName || !newReview.rating || !newReview.comment) {
+      return;
+    }
+    setReviews((prev) => [...prev, newReview]);
+    setNewReview({ reviewerName: "", rating: "1", comment: "" });
+  }
+
+  // called when the form is submitted (with all required fields)
   async function handleSubmit(event) {
     event.preventDefault();
+
+    const averageRating = 0;
+
+    // calculate average rating if there are reviews
+    if (reviews.length > 0) {
+      const averageRating =
+        reviews
+          .map((review) => parseFloat(review.rating))
+          .reduce((accumulator, currentValue) => {
+            return accumulator + currentValue;
+          }, 0) / reviews.length;
+      setAverageRating(averageRating);
+    }
 
     // Construct form data to be submitted
     const videoGameFormData = {
@@ -38,7 +73,7 @@ function AddGame() {
       platforms,
       gameModes,
       releaseYear: parseInt(releaseYear),
-      averageRating: parseFloat(averageRating),
+      averageRating,
       reviews,
     };
 
@@ -50,16 +85,16 @@ function AddGame() {
     clearFormFields();
   }
 
-  // function to clear the form fields
+  // function to clear/reset the form fields
   function clearFormFields() {
     setTitle("");
     setGenre("");
     setDevelopers("");
-    setPlatforms("");
-    setGameModes("");
-    setReleaseYear("");
-    setAverageRating("");
-    setReviews("");
+    setPlatforms([]);
+    setGameModes([]);
+    setReleaseYear("2016");
+    setAverageRating(0);
+    setReviews([]);
   }
 
   return (
@@ -215,19 +250,14 @@ function AddGame() {
             htmlFor="averageRating"
             className="block text-sm font-extrabold text-gray-700 text-center lg:text-start"
           >
-            Average Rating (out of 5)
+            Average Rating (calculated)
           </label>
-          <input
-            type="number"
+          <p
             id="averageRating"
-            name="averageRating"
-            min="1"
-            max="5"
-            step="0.1"
-            value={averageRating}
-            onChange={(e) => setAverageRating(e.target.value)}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
-          />
+            className="mt-1 p-3 border border-gray-300 rounded-md text-gray-800"
+          >
+            {averageRating === 0 ? "No reviews yet" : averageRating}
+          </p>
         </div>
 
         <div>
@@ -237,16 +267,62 @@ function AddGame() {
           >
             Reviews
           </label>
-          <textarea
-            id="reviews"
-            name="reviews"
-            rows="4"
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
-            placeholder="Write your review here"
-            required
-            value={reviews}
-            onChange={(e) => setReviews(e.target.value)}
-          ></textarea>
+          <div className="mt-1 block w-full p-3 border border-gray-300 rounded-md">
+            <label
+              htmlFor="reviewerName"
+              className="block text-sm font-semibold text-gray-700 text-center lg:text-start"
+            >
+              Reviewer Name
+            </label>
+            <input
+              type="text"
+              id="reviewerName"
+              name="reviewerName"
+              value={newReview.reviewerName}
+              onChange={(e) => handleNewReviewChange(e)}
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
+            />
+            <label
+              htmlFor="rating"
+              className="mt-1 block text-sm font-semibold text-gray-700 text-center lg:text-start"
+            >
+              Rating
+            </label>
+            <input
+              type="number"
+              id="rating"
+              name="rating"
+              min="1"
+              max="5"
+              step="0.1"
+              value={newReview.rating}
+              onChange={(e) => handleNewReviewChange(e)}
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
+            />
+            <label
+              htmlFor="comment"
+              className="mt-1 block text-sm font-semibold text-gray-700 text-center lg:text-start"
+            >
+              Comment
+            </label>
+            <textarea
+              id="comment"
+              name="comment"
+              rows="4"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
+              placeholder="Write your comment here"
+              required
+              value={newReview.comment}
+              onChange={(e) => handleNewReviewChange(e)}
+            ></textarea>
+            <button
+              type="button"
+              className="px-3 py-2 mt-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer"
+              onClick={handleSaveReview}
+            >
+              Save Review
+            </button>
+          </div>
         </div>
 
         <div className="flex justify-between mt-6">
