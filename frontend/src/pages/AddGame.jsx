@@ -52,17 +52,18 @@ function AddGame() {
   async function handleSubmit(event) {
     event.preventDefault();
 
-    const averageRating = 0;
+    let avgRating = 0;
 
     // calculate average rating if there are reviews
     if (reviews.length > 0) {
-      const averageRating =
+      avgRating = (
         reviews
           .map((review) => parseFloat(review.rating))
           .reduce((accumulator, currentValue) => {
             return accumulator + currentValue;
-          }, 0) / reviews.length;
-      setAverageRating(averageRating);
+          }, 0) / reviews.length
+      ).toFixed(1);
+      setAverageRating(avgRating);
     }
 
     // Construct form data to be submitted
@@ -73,7 +74,7 @@ function AddGame() {
       platforms,
       gameModes,
       releaseYear: parseInt(releaseYear),
-      averageRating,
+      averageRating: avgRating,
       reviews,
     };
 
@@ -95,6 +96,11 @@ function AddGame() {
     setReleaseYear("2016");
     setAverageRating(0);
     setReviews([]);
+    setNewReview({
+      reviewerName: "",
+      rating: "1",
+      comment: "",
+    });
   }
 
   return (
@@ -102,7 +108,10 @@ function AddGame() {
       <h2 className="text-5xl text-white font-semibold text-center mb-10">
         Add New Video Game
       </h2>
-      <form className="p-4 space-y-4 bg-[#f2f2f2] shadow-md w-1/3 rounded-md">
+      <form
+        className="p-4 space-y-4 bg-[#f2f2f2] shadow-md w-1/3 rounded-md"
+        onSubmit={handleSubmit}
+      >
         <div>
           <label
             htmlFor="title"
@@ -330,7 +339,6 @@ function AddGame() {
             type="submit"
             disabled={loading}
             className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer"
-            onClick={(e) => handleSubmit(e)}
           >
             {loading ? "Saving..." : "Save Game"}
           </button>
