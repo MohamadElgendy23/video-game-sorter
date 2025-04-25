@@ -3,8 +3,9 @@ import { addVideoGame } from "../api/api.js";
 
 function AddGame() {
   const [title, setTitle] = useState("");
+  const [image, setImage] = useState("");
   const [genre, setGenre] = useState("");
-  const [developers, setDevelopers] = useState("");
+  const [developers, setDevelopers] = useState([]);
   const [platforms, setPlatforms] = useState([]);
   const [gameModes, setGameModes] = useState([]);
   const [releaseYear, setReleaseYear] = useState("2016");
@@ -17,6 +18,12 @@ function AddGame() {
   });
 
   const [loading, setLoading] = useState(false);
+
+  function handleDevelopersChange(event) {
+    const input = event.target.value;
+    const developers = input.split(",").map((developer) => developer.trim());
+    setDevelopers(developers);
+  }
 
   function handlePlatformsChange(event) {
     const selectedPlatforms = Array.from(event.target.selectedOptions).map(
@@ -70,7 +77,7 @@ function AddGame() {
     const videoGameFormData = {
       title,
       genre,
-      developers: developers.split(",").map((developer) => developer.trim()),
+      developers,
       platforms,
       gameModes,
       releaseYear: parseInt(releaseYear),
@@ -89,8 +96,9 @@ function AddGame() {
   // function to clear/reset the form fields
   function clearFormFields() {
     setTitle("");
+    setImage("");
     setGenre("");
-    setDevelopers("");
+    setDevelopers([]);
     setPlatforms([]);
     setGameModes([]);
     setReleaseYear("2016");
@@ -127,6 +135,24 @@ function AddGame() {
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="image"
+            className="block text-sm font-extrabold text-gray-700 text-center lg:text-start"
+          >
+            Image (URL)
+          </label>
+          <input
+            type="text"
+            id="image"
+            name="image"
+            className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
+            required
+            value={image}
+            onChange={(e) => setImage(e.target.value)}
           />
         </div>
 
@@ -177,7 +203,7 @@ function AddGame() {
             required
             placeholder="Enter developer names, separated by commas"
             value={developers}
-            onChange={(e) => setDevelopers(e.target.value)}
+            onChange={(e) => handleDevelopersChange(e)}
           />
         </div>
 

@@ -17,7 +17,7 @@ function GameDetail() {
   }, []);
 
   return (
-    <section className="py-10 px-6 bg-[url(/)]">
+    <section className="py-10 px-6">
       {loading ? (
         <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-64">
           <div className="w-16 h-16 border-4 border-indigo-300 border-t-transparent rounded-full animate-spin"></div>
@@ -25,7 +25,9 @@ function GameDetail() {
       ) : (
         videoGame &&
         videoGame.length > 0 && (
-          <div className="flex flex-col items-center justify-center gap-3">
+          <div
+            className={`flex flex-col items-center justify-center gap-3 bg-[url(${videoGame.image})] bg-cover w-full h-screen`}
+          >
             <h3 className="text-xl font-semibold">{videoGame.title}</h3>
             <p className="text-sm text-gray-600">{videoGame.genre}</p>
             <p className="text-sm text-gray-600">{videoGame.releaseYear}</p>

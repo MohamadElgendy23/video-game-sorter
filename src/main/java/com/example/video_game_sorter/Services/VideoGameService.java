@@ -44,6 +44,7 @@ public class VideoGameService {
                 .orElseThrow(() -> new VideoGameNotFoundException("Video game not found for id: " + id));
 
         existingVideoGame.setTitle(videoGame.getTitle());
+        existingVideoGame.setImage(videoGame.getImage());
         existingVideoGame.setGenre(videoGame.getGenre());
         existingVideoGame.setDevelopers(videoGame.getDevelopers());
         existingVideoGame.setPlatforms(videoGame.getPlatforms());

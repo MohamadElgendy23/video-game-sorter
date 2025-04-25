@@ -25,6 +25,9 @@ public class VideoGame {
     private String title;
 
     @Column
+    private String image;
+
+    @Column
     private String genre;
 
     @ElementCollection
@@ -73,6 +76,12 @@ public class VideoGame {
     }
     public void setTitle(String title) {
         this.title = title;
+    }   
+    public String getImage() {
+        return image;
+    }
+    public void setImage(String image) {
+        this.image = image;
     }   
     public String getGenre() {
         return genre;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { genres, platforms } from "../data/data.js";
-import { getVideoGames, getVideoGame } from "../api/api.js";
+import { getVideoGames } from "../api/api.js";
 
 function Games() {
   const [loading, setLoading] = useState(true);
@@ -46,7 +46,14 @@ function Games() {
               key={genre}
               type="checkbox"
               className="hidden"
-              onClick={() => setActiveGenre((prev) => [...prev, genre])}
+              onClick={() => {
+                if (activeGenre.includes(genre)) {
+                  activeGenre.splice(activeGenre.indexOf(genre), 1);
+                } else {
+                  activeGenre.push(genre);
+                }
+                setActiveGenre((prev) => [...prev, activeGenre]);
+              }}
             />
           </label>
         ))}
@@ -63,7 +70,14 @@ function Games() {
               key={platform}
               type="checkbox"
               className="hidden"
-              onClick={() => setActivePlatform((prev) => [...prev, platform])}
+              onClick={() => {
+                if (activePlatform.includes(platform)) {
+                  activePlatform.splice(activePlatform.indexOf(platform), 1);
+                } else {
+                  activePlatform.push(platform);
+                }
+                setActivePlatform((prev) => [...prev, activePlatform]);
+              }}
             ></input>
           </label>
         ))}
@@ -82,6 +96,7 @@ function Games() {
               onClick={() => navigate(`/games/${game.id}`)}
             >
               <h3 className="text-xl font-semibold">{game.title}</h3>
+              <img src={game.image} alt="Video game image" className="" />
               <p className="text-sm text-gray-600">{game.genre}</p>
               <p className="text-sm text-gray-600">{game.releaseYear}</p>
               <p className="text-sm text-gray-600">{game.averageRating}</p>
