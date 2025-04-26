@@ -70,21 +70,26 @@ function Games() {
               type="checkbox"
               className="hidden"
               onClick={() => {
-                if (!activeGenre.includes(genre)) {
-                  if (genre === "All") {
-                    // can't have All and some other genre(s) at the same time
-                    activeGenre.splice(1);
-                    activeGenre.push(genre);
-                  } else {
-                    if (activeGenre.includes("All")) {
-                      return;
+                setActiveGenre((prevActiveGenre) => {
+                  let currActiveGenre = [...prevActiveGenre];
+                  if (!currActiveGenre.includes(genre)) {
+                    if (genre === "All") {
+                      // Can't have "All" and other genres at the same time
+                      return ["All"];
+                    } else {
+                      if (currActiveGenre.includes("All")) {
+                        return currActiveGenre;
+                      }
+                      currActiveGenre = [...currActiveGenre, genre];
                     }
-                    activeGenre.push(genre);
+                  } else {
+                    currActiveGenre = currActiveGenre.filter(
+                      (item) => item !== genre
+                    );
                   }
-                } else {
-                  activeGenre.splice(activeGenre.indexOf(genre), 1);
-                }
-                setActiveGenre((prev) => [...prev, activeGenre]);
+
+                  return currActiveGenre;
+                });
               }}
             />
           </label>
@@ -103,21 +108,26 @@ function Games() {
               type="checkbox"
               className="hidden"
               onClick={() => {
-                if (!activePlatform.includes(platform)) {
-                  if (platform === "All") {
-                    // can't have All and some other platform(s) at the same time
-                    activePlatform.splice(1);
-                    activePlatform.push(platform);
-                  } else {
-                    if (activePlatform.includes("All")) {
-                      return;
+                setActivePlatform((prevActivePlatform) => {
+                  let currActivePlatform = [...prevActivePlatform];
+                  if (!currActivePlatform.includes(platform)) {
+                    if (platform === "All") {
+                      // Can't have "All" and other platforms at the same time
+                      return ["All"];
+                    } else {
+                      if (currActivePlatform.includes("All")) {
+                        return currActivePlatform;
+                      }
+                      currActivePlatform = [...currActivePlatform, platform];
                     }
-                    activePlatform.push(platform);
+                  } else {
+                    currActivePlatform = currActivePlatform.filter(
+                      (item) => item !== platform
+                    );
                   }
-                } else {
-                  activePlatform.splice(activePlatform.indexOf(platform), 1);
-                }
-                setActivePlatform((prev) => [...prev, activePlatform]);
+
+                  return currActivePlatform;
+                });
               }}
             ></input>
           </label>
@@ -136,16 +146,17 @@ function Games() {
               type="checkbox"
               className="hidden"
               onClick={() => {
-                let currActiveGameMode = [...activeGameMode];
-                if (currActiveGameMode.includes(gameMode)) {
-                  currActiveGameMode.splice(
-                    currActiveGameMode.indexOf(gameMode),
-                    1
-                  );
-                } else {
-                  currActiveGameMode.push(gameMode);
-                }
-                setActiveGameMode((prev) => [...prev, currActiveGameMode]);
+                setActiveGameMode((activeGameMode) => {
+                  let currActiveGameMode = [...activeGameMode];
+                  if (currActiveGameMode.includes(gameMode)) {
+                    currActiveGameMode = currActiveGameMode.filter(
+                      (item) => item !== gameMode
+                    );
+                  } else {
+                    currActiveGameMode = [...currActiveGameMode, gameMode];
+                  }
+                  return currActiveGameMode;
+                });
               }}
             ></input>
           </label>
