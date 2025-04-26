@@ -106,31 +106,52 @@ function AddGame() {
 
   function handlePlatformsChange(event) {
     const { value, checked } = event.target;
-    if (checked) {
-      if (value === "All") {
-        return platformsArr;
+    let currPlatforms = [...platforms];
+
+    if (value === "All") {
+      if (checked) {
+        currPlatforms = [...platformsArr];
       } else {
-        platforms.push(value);
+        currPlatforms = [];
       }
-      setPlatforms(platforms);
     } else {
-      if (value === "All") {
-        return [];
+      if (checked) {
+        if (!currPlatforms.includes(value)) {
+          currPlatforms.push(value);
+        }
       } else {
-        platforms.splice(platforms.indexOf(value), 1);
+        currPlatforms = currPlatforms.filter((platform) => platform !== value);
       }
     }
-    setPlatforms((prev) => [...prev, platforms]);
+
+    setPlatforms(currPlatforms);
+
+    localStorage.setItem("platforms", JSON.stringify(currPlatforms));
   }
 
   function handleGameModesChange(event) {
     const { value, checked } = event.target;
-    if (checked) {
-      gameModes.push(value);
+    let currGameModes = [...gameModes];
+
+    if (value === "All") {
+      if (checked) {
+        currGameModes = [...gameModesArr];
+      } else {
+        currGameModes = [];
+      }
     } else {
-      gameModes.splice(gameModes.indexOf(value), 1);
+      if (checked) {
+        if (!currGameModes.includes(value)) {
+          currGameModes.push(value);
+        }
+      } else {
+        currGameModes = currGameModes.filter((platform) => platform !== value);
+      }
     }
-    setGameModes((prev) => [...prev, gameModes]);
+
+    setGameModes(currGameModes);
+
+    localStorage.setItem("gameModes", JSON.stringify(currGameModes));
   }
 
   function handleNewReviewChange(event) {
@@ -320,7 +341,19 @@ function AddGame() {
           </label>
 
           <div className="mt-1 grid grid-cols-2 gap-2">
-            {platformsArr.map((platform) => (
+            <label key="All" className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                name="platforms"
+                id="platforms"
+                value="All"
+                checked={platforms.length === platformsArr.length}
+                onChange={(e) => handlePlatformsChange(e)}
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+              />
+              <span>All</span>
+            </label>
+            {platformsArr.slice(1).map((platform) => (
               <label key={platform} className="flex items-center space-x-2">
                 <input
                   type="checkbox"
@@ -345,7 +378,19 @@ function AddGame() {
             Game Modes
           </label>
           <div className="mt-1 grid grid-cols-2 gap-2">
-            {gameModesArr.map((gameMode) => (
+            <label key="All" className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                name="gameModes"
+                id="gameModes"
+                value="All"
+                checked={gameModes.length === gameModesArr.length}
+                onChange={(e) => handleGameModesChange(e)}
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+              />
+              <span>All</span>
+            </label>
+            {gameModesArr.slice(0).map((gameMode) => (
               <label key={gameMode} className="flex items-center space-x-2">
                 <input
                   type="checkbox"
