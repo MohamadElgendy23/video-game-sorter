@@ -150,8 +150,6 @@ function AddGame() {
     }
 
     setGameModes(currGameModes);
-
-    localStorage.setItem("gameModes", JSON.stringify(currGameModes));
   }
 
   function handleNewReviewChange(event) {
@@ -180,8 +178,6 @@ function AddGame() {
       ).toFixed(1);
     }
     setAverageRating(avgRating);
-
-    localStorage.setItem("averageRating", JSON.stringify(avgRating));
 
     setNewReview({ reviewerName: "", rating: "1", comment: "" });
   }
