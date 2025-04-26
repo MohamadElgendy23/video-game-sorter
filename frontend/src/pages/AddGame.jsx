@@ -102,6 +102,7 @@ function AddGame() {
     const input = event.target.value;
     const developers = input.split(",").map((developer) => developer.trim());
     setDevelopers(developers);
+    localStorage.setItem("developers", JSON.stringify(developers));
   }
 
   function handlePlatformsChange(event) {
@@ -180,6 +181,8 @@ function AddGame() {
       ).toFixed(1);
     }
     setAverageRating(avgRating);
+
+    localStorage.setItem("averageRating", JSON.stringify(avgRating));
 
     setNewReview({ reviewerName: "", rating: "1", comment: "" });
   }
