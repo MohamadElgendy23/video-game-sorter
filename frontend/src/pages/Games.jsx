@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { genres, platforms } from "../data/data.js";
-import { getVideoGames } from "../api/api.js";
+import { getVideoGames } from "../api/videoGameAPI.js";
 
 function Games() {
   const [loading, setLoading] = useState(true);

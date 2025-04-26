@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getVideoGame } from "../api/api";
+import { getVideoGame } from "../api/videoGameAPI.js";
 
 function GameDetail() {
   const [loading, setLoading] = useState(true);

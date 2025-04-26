@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { addVideoGame } from "../api/videoGameAPI.js";
 import { addReview } from "../api/reviewAPI.js";
 import {
@@ -6,23 +6,97 @@ import {
   gameModes as gameModesArr,
 } from "../data/data.js";
 
+// Get any existing data in localStorage
+const existingTitle = () =>
+  localStorage.getItem("title")
+    ? JSON.parse(localStorage.getItem("title"))
+    : "";
+const existingImage = () =>
+  localStorage.getItem("image")
+    ? JSON.parse(localStorage.getItem("image"))
+    : "";
+const existingGenre = () =>
+  localStorage.getItem("genre")
+    ? JSON.parse(localStorage.getItem("genre"))
+    : "";
+const existingDevelopers = () =>
+  localStorage.getItem("developers")
+    ? JSON.parse(localStorage.getItem("developers"))
+    : [];
+const existingPlatforms = () =>
+  localStorage.getItem("platforms")
+    ? JSON.parse(localStorage.getItem("platforms"))
+    : [];
+const existingGameModes = () =>
+  localStorage.getItem("gameModes")
+    ? JSON.parse(localStorage.getItem("gameModes"))
+    : [];
+const existingReleaseYear = () =>
+  localStorage.getItem("releaseYear")
+    ? JSON.parse(localStorage.getItem("releaseYear"))
+    : "2016";
+const existingAverageRatings = () =>
+  localStorage.getItem("averageRating")
+    ? Number(JSON.parse(localStorage.getItem("averageRating")))
+    : 0;
+const existingReviews = () =>
+  localStorage.getItem("reviews")
+    ? JSON.parse(localStorage.getItem("reviews"))
+    : [];
+const existingNewReview = () =>
+  localStorage.getItem("newReview")
+    ? JSON.parse(localStorage.getItem("newReview"))
+    : {
+        reviewerName: "",
+        rating: "1",
+        comment: "",
+      };
+
 function AddGame() {
-  const [title, setTitle] = useState("");
-  const [image, setImage] = useState("");
-  const [genre, setGenre] = useState("");
-  const [developers, setDevelopers] = useState([]);
-  const [platforms, setPlatforms] = useState([]);
-  const [gameModes, setGameModes] = useState([]);
-  const [releaseYear, setReleaseYear] = useState("2016");
-  const [averageRating, setAverageRating] = useState(0);
-  const [reviews, setReviews] = useState([]);
-  const [newReview, setNewReview] = useState({
-    reviewerName: "",
-    rating: "1",
-    comment: "",
-  });
+  const [title, setTitle] = useState(existingTitle());
+  const [image, setImage] = useState(existingImage());
+  const [genre, setGenre] = useState(existingGenre());
+  const [developers, setDevelopers] = useState(existingDevelopers());
+  const [platforms, setPlatforms] = useState(existingPlatforms());
+  const [gameModes, setGameModes] = useState(existingGameModes());
+  const [releaseYear, setReleaseYear] = useState(existingReleaseYear());
+  const [averageRating, setAverageRating] = useState(existingAverageRatings());
+  const [reviews, setReviews] = useState(existingReviews);
+  const [newReview, setNewReview] = useState(existingNewReview());
 
   const [loading, setLoading] = useState(false);
+
+  // save to local storage when fields change
+  useEffect(() => {
+    localStorage.setItem("title", JSON.stringify(title));
+  }, [title]);
+  useEffect(() => {
+    localStorage.setItem("image", JSON.stringify(image));
+  }, [image]);
+  useEffect(() => {
+    localStorage.setItem("genre", JSON.stringify(genre));
+  }, [genre]);
+  useEffect(() => {
+    localStorage.setItem("developers", JSON.stringify(developers));
+  }, [developers]);
+  useEffect(() => {
+    localStorage.setItem("platforms", JSON.stringify(platforms));
+  }, [platforms]);
+  useEffect(() => {
+    localStorage.setItem("gameModes", JSON.stringify(gameModes));
+  }, [gameModes]);
+  useEffect(() => {
+    localStorage.setItem("releaseYear", JSON.stringify(releaseYear));
+  }, [releaseYear]);
+  useEffect(() => {
+    localStorage.setItem("averageRating", JSON.stringify(averageRating));
+  }, [averageRating]);
+  useEffect(() => {
+    localStorage.setItem("reviews", JSON.stringify(reviews));
+  }, [reviews]);
+  useEffect(() => {
+    localStorage.setItem("newReview", JSON.stringify(newReview));
+  }, [newReview]);
 
   function handleDevelopersChange(event) {
     const input = event.target.value;
@@ -33,9 +107,18 @@ function AddGame() {
   function handlePlatformsChange(event) {
     const { value, checked } = event.target;
     if (checked) {
-      platforms.push(value);
+      if (value === "All") {
+        return platformsArr;
+      } else {
+        platforms.push(value);
+      }
+      setPlatforms(platforms);
     } else {
-      platforms.splice(platforms.indexOf(value), 1);
+      if (value === "All") {
+        return [];
+      } else {
+        platforms.splice(platforms.indexOf(value), 1);
+      }
     }
     setPlatforms((prev) => [...prev, platforms]);
   }
@@ -63,17 +146,9 @@ function AddGame() {
       return;
     }
     setReviews((prev) => [...prev, newReview]);
-    setAverageRating();
-    setNewReview({ reviewerName: "", rating: "1", comment: "" });
-  }
 
-  // called when the form is submitted (with all required fields)
-  async function handleSubmit(event) {
-    event.preventDefault();
-
+    // calculate average rating of reviews on the fly (if there contains reviews)
     let avgRating = 0;
-
-    // calculate average rating if there are reviews
     if (reviews.length > 0) {
       avgRating = (
         reviews
@@ -82,8 +157,15 @@ function AddGame() {
             return accumulator + currentValue;
           }, 0) / reviews.length
       ).toFixed(1);
-      setAverageRating(avgRating);
     }
+    setAverageRating(avgRating);
+
+    setNewReview({ reviewerName: "", rating: "1", comment: "" });
+  }
+
+  // called when the form is submitted (with all required fields)
+  async function handleSubmit(event) {
+    event.preventDefault();
 
     // Construct form data to be submitted
     const videoGameFormData = {
@@ -93,7 +175,7 @@ function AddGame() {
       platforms,
       gameModes,
       releaseYear: parseInt(releaseYear),
-      averageRating: avgRating,
+      averageRating,
       reviews,
     };
 
