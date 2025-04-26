@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { addVideoGame } from "../api/videoGameAPI.js";
-import { addReview } from "../api/reviewAPI.js";
+import { addVideoGame, searchVideoGames } from "../api/videoGameAPI.js";
 import {
   platforms as platformsArr,
   gameModes as gameModesArr,

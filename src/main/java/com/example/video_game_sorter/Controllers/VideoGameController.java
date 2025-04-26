@@ -15,6 +15,7 @@ import com.example.video_game_sorter.Models.VideoGame;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
 
 
@@ -35,6 +36,11 @@ public class VideoGameController {
     @GetMapping("/{id}")
     public VideoGame getVideoGame(@PathVariable Long id) {
        return videoGameService.getVideoGame(id);
+    }
+
+    @GetMapping("/search")
+    public List<VideoGame> searchVideoGames(@RequestParam String title) {
+        return videoGameService.searchVideoGames(title);
     }
 
     @PostMapping

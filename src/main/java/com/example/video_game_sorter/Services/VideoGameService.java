@@ -32,6 +32,14 @@ public class VideoGameService {
         return existingVideoGame;
     }
 
+    public List<VideoGame> searchVideoGames(String title) {
+        List<VideoGame> existingVideoGames = videoGameRepository.findByTitleContainingIgnoreCase(title);
+        if (existingVideoGames.isEmpty()) {
+            throw new VideoGameNotFoundException("No video games found!");
+        }
+        return existingVideoGames;
+    }
+
     public void addVideoGame(VideoGame videoGame) {
         if (videoGameRepository.existsById(videoGame.getId())) {
             throw new VideoGameAlreadyExistsException("Video game already exists!");

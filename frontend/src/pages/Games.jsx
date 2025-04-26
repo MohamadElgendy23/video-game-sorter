@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, act } from "react";
 import { useNavigate } from "react-router-dom";
-import { genres, platforms } from "../data/data.js";
+import { genres, platforms, gameModes } from "../data/data.js";
 import { getVideoGames } from "../api/videoGameAPI.js";
 
 function Games() {
@@ -8,6 +8,7 @@ function Games() {
   const [games, setGames] = useState([]);
   const [activeGenre, setActiveGenre] = useState(["All"]);
   const [activePlatform, setActivePlatform] = useState(["All"]);
+  const [activeGameMode, setActiveGameMode] = useState(["Single-player"]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,6 +21,28 @@ function Games() {
         setLoading(false);
       });
   }, []);
+
+  // function toggleGenre(genre) {
+  //   let updatedGenre = [...activeGenre];
+  //   // Toggle off
+  //   if (activeGenre.includes(genre)) {
+  //     updatedGenre.splice(updatedGenre.indexOf(genre), 1);
+  //   }
+  //   // Toggle on
+  //   else {
+  //     // don't update if it already has All
+  //     if (updatedGenre.includes("All")) {
+  //       return;
+  //     }
+  //     if (genre === "All") {
+  //       updatedGenre = ["All"];
+  //     } else {
+  //       updatedGenre.push(genre);
+  //     }
+  //   }
+
+  //   setActiveGenre(updatedGenre);
+  // }
 
   return (
     <section className="py-10 px-6">
@@ -47,10 +70,19 @@ function Games() {
               type="checkbox"
               className="hidden"
               onClick={() => {
-                if (activeGenre.includes(genre)) {
-                  activeGenre.splice(activeGenre.indexOf(genre), 1);
+                if (!activeGenre.includes(genre)) {
+                  if (genre === "All") {
+                    // can't have All and some other genre(s) at the same time
+                    activeGenre.splice(1);
+                    activeGenre.push(genre);
+                  } else {
+                    if (activeGenre.includes("All")) {
+                      return;
+                    }
+                    activeGenre.push(genre);
+                  }
                 } else {
-                  activeGenre.push(genre);
+                  activeGenre.splice(activeGenre.indexOf(genre), 1);
                 }
                 setActiveGenre((prev) => [...prev, activeGenre]);
               }}
@@ -71,12 +103,49 @@ function Games() {
               type="checkbox"
               className="hidden"
               onClick={() => {
-                if (activePlatform.includes(platform)) {
-                  activePlatform.splice(activePlatform.indexOf(platform), 1);
+                if (!activePlatform.includes(platform)) {
+                  if (platform === "All") {
+                    // can't have All and some other platform(s) at the same time
+                    activePlatform.splice(1);
+                    activePlatform.push(platform);
+                  } else {
+                    if (activePlatform.includes("All")) {
+                      return;
+                    }
+                    activePlatform.push(platform);
+                  }
                 } else {
-                  activePlatform.push(platform);
+                  activePlatform.splice(activePlatform.indexOf(platform), 1);
                 }
                 setActivePlatform((prev) => [...prev, activePlatform]);
+              }}
+            ></input>
+          </label>
+        ))}
+      </div>
+
+      {/* Game Modes filter */}
+      <div className="flex justify-center gap-4 flex-wrap mb-6">
+        {gameModes.map((gameMode) => (
+          <label
+            className={`border border-gray-300 text-lg px-4 py-2 rounded cursor-pointer ${activeGameMode.includes(gameMode) ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-white text-black hover:bg-indigo-100"}`}
+          >
+            {gameMode}
+            <input
+              key={gameMode}
+              type="checkbox"
+              className="hidden"
+              onClick={() => {
+                let currActiveGameMode = [...activeGameMode];
+                if (currActiveGameMode.includes(gameMode)) {
+                  currActiveGameMode.splice(
+                    currActiveGameMode.indexOf(gameMode),
+                    1
+                  );
+                } else {
+                  currActiveGameMode.push(gameMode);
+                }
+                setActiveGameMode((prev) => [...prev, currActiveGameMode]);
               }}
             ></input>
           </label>

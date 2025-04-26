@@ -1,7 +1,7 @@
 // this file contains the video game api handlers for the frontend
 import axios from "axios";
 
-const baseURL = "http://localhost:8080/api/videogames/";
+const baseURL = "http://localhost:8080/api/videogames";
 
 // function to get the video games
 export async function getVideoGames() {
@@ -18,6 +18,17 @@ export async function getVideoGames() {
 export async function getVideoGame(id) {
   try {
     const response = await axios.get(`${baseURL}/${id}`);
+    const data = response.data;
+    return data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}
+
+// function to search video games by title
+export async function searchVideoGames(title) {
+  try {
+    const response = await axios.get(`${baseURL}/search`);
     const data = response.data;
     return data;
   } catch (error) {

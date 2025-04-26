@@ -30,23 +30,5 @@ public class ReviewController {
     public List<Review> getReviews(@PathVariable long videoGameId) {
         return reviewService.getReviews(videoGameId);
     }
-
-    @PostMapping
-    public ResponseEntity<String> addReview(@RequestBody Review review) {
-        reviewService.addReview(review);
-        return ResponseEntity.ok("Review added successfully.");
-    }
-
-    @PutMapping(value="/{id}")
-    public ResponseEntity<String> updateReview(@PathVariable Long id, @RequestBody Review review) {
-        reviewService.updateReview(id, review);
-        return ResponseEntity.ok("Review updated successfully.");
-    }
-
-    @DeleteMapping(value="/{id}")
-    public ResponseEntity<String> deleteReview(@PathVariable Long id) {
-        reviewService.deleteReview(id);
-        return ResponseEntity.ok("Review deleted successfully.");
-    }
     
 }
