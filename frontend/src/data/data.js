@@ -17,4 +17,26 @@ export const genres = [
   "Horror",
 ];
 
-export const platforms = ["All", "PC", "PS5", "Xbox", "Switch", "Browser"];
+export const platforms = [
+  "All",
+  "PC",
+  "PlayStation",
+  "Xbox",
+  "Wii",
+  "Switch",
+  "Game Boy",
+  "Browser",
+];
+
+export const gameModes = [
+  "Single-player",
+  "Multiplayer",
+  "Co-op",
+  "Versus (PvP)",
+  "Campaign",
+  "Sandbox",
+  "Battle Royale",
+  "Split-screen",
+  "Online",
+  "Offline",
+];

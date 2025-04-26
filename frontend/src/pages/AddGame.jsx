@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import { addVideoGame } from "../api/api.js";
+import { addVideoGame } from "../api/videoGameAPI.js";
+import { addReview } from "../api/reviewAPI.js";
+import {
+  platforms as platformsArr,
+  gameModes as gameModesArr,
+} from "../data/data.js";
 
 function AddGame() {
   const [title, setTitle] = useState("");
@@ -26,17 +31,23 @@ function AddGame() {
   }
 
   function handlePlatformsChange(event) {
-    const selectedPlatforms = Array.from(event.target.selectedOptions).map(
-      (selectedOption) => selectedOption.value
-    );
-    setPlatforms(selectedPlatforms);
+    const { value, checked } = event.target;
+    if (checked) {
+      platforms.push(value);
+    } else {
+      platforms.splice(platforms.indexOf(value), 1);
+    }
+    setPlatforms((prev) => [...prev, platforms]);
   }
 
   function handleGameModesChange(event) {
-    const selectedGameModes = Array.from(event.target.selectedOptions).map(
-      (selectedOption) => selectedOption.value
-    );
-    setGameModes(selectedGameModes);
+    const { value, checked } = event.target;
+    if (checked) {
+      gameModes.push(value);
+    } else {
+      gameModes.splice(gameModes.indexOf(value), 1);
+    }
+    setGameModes((prev) => [...prev, gameModes]);
   }
 
   function handleNewReviewChange(event) {
@@ -52,6 +63,7 @@ function AddGame() {
       return;
     }
     setReviews((prev) => [...prev, newReview]);
+    setAverageRating();
     setNewReview({ reviewerName: "", rating: "1", comment: "" });
   }
 
@@ -145,6 +157,16 @@ function AddGame() {
           >
             Image (URL)
           </label>
+          {/* <input
+            type="file"
+            id="image"
+            name="image"
+            className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
+            required
+            value={image}
+            onChange={(e) => setImage(e.target.value)}
+            accept="image/png, image/jpeg"
+          /> */}
           <input
             type="text"
             id="image"
@@ -214,21 +236,23 @@ function AddGame() {
           >
             Platforms
           </label>
-          <select
-            id="platforms"
-            name="platforms"
-            multiple
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
-            required
-            value={platforms}
-            onChange={(e) => handlePlatformsChange(e)}
-          >
-            <option value="PC">PC</option>
-            <option value="PS5">PS5</option>
-            <option value="Xbox">Xbox</option>
-            <option value="Switch">Switch</option>
-            <option value="Browser">Browser</option>
-          </select>
+
+          <div className="mt-1 grid grid-cols-2 gap-2">
+            {platformsArr.map((platform) => (
+              <label key={platform} className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  name="platforms"
+                  id="platforms"
+                  value={platform}
+                  checked={platforms.includes(platform)}
+                  onChange={(e) => handlePlatformsChange(e)}
+                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                />
+                <span>{platform}</span>
+              </label>
+            ))}
+          </div>
         </div>
 
         <div>
@@ -238,26 +262,22 @@ function AddGame() {
           >
             Game Modes
           </label>
-          <select
-            id="gameModes"
-            name="gameModes"
-            multiple
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
-            required
-            value={gameModes}
-            onChange={(e) => handleGameModesChange(e)}
-          >
-            <option value="Single-player">Single-player</option>
-            <option value="Multiplayer">Multiplayer</option>
-            <option value="Co-op">Co-op</option>
-            <option value="Versus (PvP)">Versus (PvP)</option>
-            <option value="Campaign">Campaign</option>
-            <option value="Sandbox">Sandbox</option>
-            <option value="Battle Royale">Battle Royale</option>
-            <option value="Split-screen">Split-screen</option>
-            <option value="Online">Online</option>
-            <option value="Offline">Offline</option>
-          </select>
+          <div className="mt-1 grid grid-cols-2 gap-2">
+            {gameModesArr.map((gameMode) => (
+              <label key={gameMode} className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  name="gameModes"
+                  id="gameModes"
+                  value={gameMode}
+                  checked={gameModes.includes(gameMode)}
+                  onChange={(e) => handleGameModesChange(e)}
+                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                />
+                <span>{gameMode}</span>
+              </label>
+            ))}
+          </div>
         </div>
 
         <div>

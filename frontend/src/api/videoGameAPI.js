@@ -1,4 +1,4 @@
-// this file contains the api handlers for the frontend
+// this file contains the video game api handlers for the frontend
 import axios from "axios";
 
 const baseURL = "http://localhost:8080/api/videogames/";
