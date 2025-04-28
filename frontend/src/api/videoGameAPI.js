@@ -25,17 +25,6 @@ export async function getVideoGame(id) {
   }
 }
 
-// function to search video games by title
-export async function searchVideoGames(title) {
-  try {
-    const response = await axios.get(`${baseURL}/search`);
-    const data = response.data;
-    return data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-}
-
 // function to add/create a video game
 export async function addVideoGame(newGame) {
   try {

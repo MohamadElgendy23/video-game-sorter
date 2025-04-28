@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { addVideoGame, searchVideoGames } from "../api/videoGameAPI.js";
+import { addVideoGame } from "../api/videoGameAPI.js";
 import {
   platforms as platformsArr,
   gameModes as gameModesArr,
 } from "../data/data.js";
 
-// Get any existing data in localStorage
+// Get any existing data from localStorage
 const existingTitle = () =>
   localStorage.getItem("title")
     ? JSON.parse(localStorage.getItem("title"))
@@ -217,6 +217,15 @@ function AddGame() {
     setReleaseYear("2016");
     setAverageRating(0);
     setReviews([]);
+    setNewReview({
+      reviewerName: "",
+      rating: "1",
+      comment: "",
+    });
+  }
+
+  // function to clear/reset the review fields
+  function clearReviewFields() {
     setNewReview({
       reviewerName: "",
       rating: "1",
@@ -495,13 +504,23 @@ function AddGame() {
               value={newReview.comment}
               onChange={(e) => handleNewReviewChange(e)}
             ></textarea>
-            <button
-              type="button"
-              className="px-3 py-2 mt-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer"
-              onClick={handleSaveReview}
-            >
-              Save Review
-            </button>
+
+            <div className="flex justify-between mt-6">
+              <button
+                type="button"
+                className="px-3 py-2 mt-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer"
+                onClick={handleSaveReview}
+              >
+                Save Review
+              </button>
+              <button
+                type="button"
+                className="px-3 py-2 mt-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer"
+                onClick={clearReviewFields}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
 

@@ -19,10 +19,7 @@ public class VideoGameService {
     
     public List<VideoGame> getVideoGames() {
         List<VideoGame> existingVideoGames = videoGameRepository.findAll();
-        if (existingVideoGames.isEmpty()) {
-            throw new VideoGameNotFoundException("No video games found!");
-        }
-        return existingVideoGames;
+        return existingVideoGames; // return empty list if no video games
     }
 
     public VideoGame getVideoGame(Long id) {
@@ -30,14 +27,6 @@ public class VideoGameService {
         .orElseThrow(() -> new VideoGameNotFoundException("Video game not found for id: " + id));
 
         return existingVideoGame;
-    }
-
-    public List<VideoGame> searchVideoGames(String title) {
-        List<VideoGame> existingVideoGames = videoGameRepository.findByTitleContainingIgnoreCase(title);
-        if (existingVideoGames.isEmpty()) {
-            throw new VideoGameNotFoundException("No video games found!");
-        }
-        return existingVideoGames;
     }
 
     public void addVideoGame(VideoGame videoGame) {

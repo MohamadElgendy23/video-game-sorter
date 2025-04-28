@@ -1,4 +1,4 @@
-import React, { useState, useEffect, act } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { genres, platforms, gameModes } from "../data/data.js";
 import { getVideoGames } from "../api/videoGameAPI.js";
@@ -9,6 +9,7 @@ function Games() {
   const [activeGenre, setActiveGenre] = useState(["All"]);
   const [activePlatform, setActivePlatform] = useState(["All"]);
   const [activeGameMode, setActiveGameMode] = useState(["Single-player"]);
+  const [query, setQuery] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,30 +23,21 @@ function Games() {
       });
   }, []);
 
-  // function toggleGenre(genre) {
-  //   let updatedGenre = [...activeGenre];
-  //   // Toggle off
-  //   if (activeGenre.includes(genre)) {
-  //     updatedGenre.splice(updatedGenre.indexOf(genre), 1);
-  //   }
-  //   // Toggle on
-  //   else {
-  //     // don't update if it already has All
-  //     if (updatedGenre.includes("All")) {
-  //       return;
-  //     }
-  //     if (genre === "All") {
-  //       updatedGenre = ["All"];
-  //     } else {
-  //       updatedGenre.push(genre);
-  //     }
-  //   }
+  useEffect(() => {
+    setLoading(true);
 
-  //   setActiveGenre(updatedGenre);
-  // }
+    // filter video games by query
+    let currVideoGames = [...games];
+    currVideoGames = currVideoGames.filter((videoGame) =>
+      videoGame.title.toLowerCase().startsWith(query)
+    );
+    setGames(currVideoGames);
+
+    setLoading(false);
+  }, [query]);
 
   return (
-    <section className="py-10 px-6">
+    <section className="flex flex-col items-center py-10 px-6">
       <h2 className="text-5xl font-bold text-white text-center mb-7">
         Browse Games by Category
       </h2>
@@ -96,6 +88,35 @@ function Games() {
         ))}
       </div>
 
+      {/* Game Modes filter */}
+      <div className="flex justify-center gap-4 flex-wrap mb-6">
+        {gameModes.map((gameMode) => (
+          <label
+            className={`border border-gray-300 text-lg px-4 py-2 rounded cursor-pointer ${activeGameMode.includes(gameMode) ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-white text-black hover:bg-indigo-100"}`}
+          >
+            {gameMode}
+            <input
+              key={gameMode}
+              type="checkbox"
+              className="hidden"
+              onClick={() => {
+                setActiveGameMode((activeGameMode) => {
+                  let currActiveGameMode = [...activeGameMode];
+                  if (currActiveGameMode.includes(gameMode)) {
+                    currActiveGameMode = currActiveGameMode.filter(
+                      (item) => item !== gameMode
+                    );
+                  } else {
+                    currActiveGameMode = [...currActiveGameMode, gameMode];
+                  }
+                  return currActiveGameMode;
+                });
+              }}
+            ></input>
+          </label>
+        ))}
+      </div>
+
       {/* Platforms filter */}
       <div className="flex justify-center gap-4 flex-wrap mb-6">
         {platforms.map((platform) => (
@@ -134,33 +155,22 @@ function Games() {
         ))}
       </div>
 
-      {/* Game Modes filter */}
-      <div className="flex justify-center gap-4 flex-wrap mb-6">
-        {gameModes.map((gameMode) => (
-          <label
-            className={`border border-gray-300 text-lg px-4 py-2 rounded cursor-pointer ${activeGameMode.includes(gameMode) ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-white text-black hover:bg-indigo-100"}`}
-          >
-            {gameMode}
-            <input
-              key={gameMode}
-              type="checkbox"
-              className="hidden"
-              onClick={() => {
-                setActiveGameMode((activeGameMode) => {
-                  let currActiveGameMode = [...activeGameMode];
-                  if (currActiveGameMode.includes(gameMode)) {
-                    currActiveGameMode = currActiveGameMode.filter(
-                      (item) => item !== gameMode
-                    );
-                  } else {
-                    currActiveGameMode = [...currActiveGameMode, gameMode];
-                  }
-                  return currActiveGameMode;
-                });
-              }}
-            ></input>
-          </label>
-        ))}
+      {/* Games Search Bar */}
+      <div className="flex justify-start w-full max-w-md mt-5 mb-5 bg-white border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-blue-500">
+        <div className="absolute transform -translate-x-1/2 max-w-md">
+          <div className="absolute inset-y-0 left-2 top-6 flex items-center pointer-events-none">
+            <i className="fa-solid fa-magnifying-glass text-lg"></i>
+          </div>
+        </div>
+        <input
+          type="text"
+          id="search"
+          name="search"
+          className="text-black w-full p-3 ml-5 focus:outline-none"
+          value={query}
+          placeholder="Search games by title..."
+          onChange={(e) => setQuery(e.target.value)}
+        />
       </div>
 
       {loading ? (
@@ -176,7 +186,7 @@ function Games() {
               onClick={() => navigate(`/games/${game.id}`)}
             >
               <h3 className="text-xl font-semibold">{game.title}</h3>
-              <img src={game.image} alt="Video game image" className="" />
+              <img className="" src={game.image} alt="Video game image" />
               <p className="text-sm text-gray-600">{game.genre}</p>
               <p className="text-sm text-gray-600">{game.releaseYear}</p>
               <p className="text-sm text-gray-600">{game.averageRating}</p>
