@@ -34,11 +34,6 @@ public class VideoGameController {
         return videoGameService.getVideoGames();
     }
 
-    @GetMapping
-    public List<VideoGame> filterVideoGames(@RequestParam List<String> genres, @RequestParam List<String> platforms, @RequestParam List<String> gameModes) {
-        return videoGameService.filterVideoGames(genres, platforms, gameModes);
-    }
-
     @GetMapping("/{id}")
     public VideoGame getVideoGame(@PathVariable Long id) {
        return videoGameService.getVideoGame(id);

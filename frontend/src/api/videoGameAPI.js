@@ -14,36 +14,6 @@ export async function getVideoGames() {
   }
 }
 
-// function to filter the video games
-export async function filterVideoGames(genres, platforms, gameModes) {
-  try {
-    const response = await axios.get(baseURL, {
-      params: {
-        genres,
-        platforms,
-        gameModes,
-      },
-      paramsSerializer: (params) => {
-        const searchParams = new URLSearchParams();
-        if (params.genres) {
-          params.genres.forEach((g) => searchParams.append("genres", g));
-        }
-        if (params.platforms) {
-          params.platforms.forEach((p) => searchParams.append("platforms", p));
-        }
-        if (params.gameModes) {
-          params.gameModes.forEach((m) => searchParams.append("gameModes", m));
-        }
-        return searchParams.toString();
-      },
-    });
-    const data = response.data;
-    return data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-}
-
 // function to get a video game by id
 export async function getVideoGame(id) {
   try {

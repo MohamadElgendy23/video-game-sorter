@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { genres, platforms, gameModes } from "../data/data.js";
-import { getVideoGames, filterVideoGames } from "../api/videoGameAPI.js";
+import { getVideoGames } from "../api/videoGameAPI.js";
+import { useDebouncedValue } from "../hooks/useDebouncedValue.js";
 
 function Games() {
   const [loading, setLoading] = useState(true);
@@ -10,6 +11,8 @@ function Games() {
   const [activePlatform, setActivePlatform] = useState(["All"]);
   const [activeGameMode, setActiveGameMode] = useState(["Single-player"]);
   const [query, setQuery] = useState("");
+  const debouncedQuery = useDebouncedValue(query, 300);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,8 +30,8 @@ function Games() {
   const games = useMemo(() => {
     return allGames.filter((videoGame) => {
       const matchesQuery =
-        query === "" ||
-        videoGame.title.toLowerCase().startsWith(query.toLowerCase());
+        debouncedQuery === "" ||
+        videoGame.title.toLowerCase().startsWith(debouncedQuery.toLowerCase());
 
       const matchesGenres =
         activeGenre === "All" || activeGenre === videoGame.genre;
@@ -49,7 +52,7 @@ function Games() {
         matchesQuery && matchesGenres && matchesPlatforms && matchesGameModes
       );
     });
-  }, [allGames, query, activeGenre, activePlatform, activeGameMode]);
+  }, [allGames, debouncedQuery, activeGenre, activePlatform, activeGameMode]);
 
   return (
     <section className="flex flex-col items-center py-10 px-6">
@@ -69,11 +72,11 @@ function Games() {
       <div className="flex justify-center gap-4 mb-6">
         {genres.map((genre) => (
           <label
+            key={genre}
             className={`border border-gray-300 text-lg px-4 py-2 rounded cursor-pointer ${activeGenre.includes(genre) ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-white text-black hover:bg-indigo-100"}`}
           >
             {genre}
             <input
-              key={genre}
               type="checkbox"
               className="hidden"
               onClick={() => {
@@ -107,11 +110,11 @@ function Games() {
       <div className="flex justify-center gap-4 flex-wrap mb-6">
         {gameModes.map((gameMode) => (
           <label
+            key={gameMode}
             className={`border border-gray-300 text-lg px-4 py-2 rounded cursor-pointer ${activeGameMode.includes(gameMode) ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-white text-black hover:bg-indigo-100"}`}
           >
             {gameMode}
             <input
-              key={gameMode}
               type="checkbox"
               className="hidden"
               onClick={() => {
@@ -136,11 +139,11 @@ function Games() {
       <div className="flex justify-center gap-4 flex-wrap mb-6">
         {platforms.map((platform) => (
           <label
+            key={platform}
             className={`border border-gray-300 text-lg px-4 py-2 rounded cursor-pointer ${activePlatform.includes(platform) ? "bg-indigo-600 text-white hover:bg-indigo-700" : "bg-white text-black hover:bg-indigo-100"}`}
           >
             {platform}
             <input
-              key={platform}
               type="checkbox"
               className="hidden"
               onClick={() => {
