@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { genres, platforms, gameModes } from "../data/data.js";
-import { getVideoGames } from "../api/videoGameAPI.js";
+import { getVideoGames, filterVideoGames } from "../api/videoGameAPI.js";
 
 function Games() {
   const [loading, setLoading] = useState(true);
-  const [games, setGames] = useState([]);
-  const [activeGenre, setActiveGenre] = useState(["All"]);
+  const [allGames, setAllGames] = useState([]);
+  const [activeGenre, setActiveGenre] = useState("All");
   const [activePlatform, setActivePlatform] = useState(["All"]);
   const [activeGameMode, setActiveGameMode] = useState(["Single-player"]);
   const [query, setQuery] = useState("");
@@ -16,25 +16,40 @@ function Games() {
     setLoading(true);
     getVideoGames()
       .then((videoGames) => {
-        setGames(videoGames);
+        setAllGames(videoGames);
       })
       .finally(() => {
         setLoading(false);
       });
   }, []);
 
-  useEffect(() => {
-    setLoading(true);
+  // games is now computed on the fly based on allGames, query, activeGenre, activePlatform, and activeGameMode
+  const games = useMemo(() => {
+    return allGames.filter((videoGame) => {
+      const matchesQuery =
+        query === "" ||
+        videoGame.title.toLowerCase().startsWith(query.toLowerCase());
 
-    // filter video games by query
-    let currVideoGames = [...games];
-    currVideoGames = currVideoGames.filter((videoGame) =>
-      videoGame.title.toLowerCase().startsWith(query)
-    );
-    setGames(currVideoGames);
+      const matchesGenres =
+        activeGenre === "All" || activeGenre === videoGame.genre;
 
-    setLoading(false);
-  }, [query]);
+      const matchesPlatforms =
+        activePlatform[0] === "All" ||
+        activePlatform.some((platform) =>
+          videoGame.platforms.includes(platform)
+        );
+
+      const matchesGameModes =
+        activeGameMode[0] === "Single-player" ||
+        activeGameMode.some((gameMode) =>
+          videoGame.gameModes.includes(gameMode)
+        );
+
+      return (
+        matchesQuery && matchesGenres && matchesPlatforms && matchesGameModes
+      );
+    });
+  }, [allGames, query, activeGenre, activePlatform, activeGameMode]);
 
   return (
     <section className="flex flex-col items-center py-10 px-6">
@@ -183,7 +198,7 @@ function Games() {
             <div
               key={game.id}
               className="bg-white shadow-md p-4 rounded-lg cursor-pointer"
-              onClick={() => navigate(`/games/${game.id}`)}
+              onClick={() => navigate(`/games/${game.id}/details`)}
             >
               <h3 className="text-xl font-semibold">{game.title}</h3>
               <img className="" src={game.image} alt="Video game image" />

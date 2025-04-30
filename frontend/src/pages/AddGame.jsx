@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { addVideoGame } from "../api/videoGameAPI.js";
+import { getVideoGames, addVideoGame } from "../api/videoGameAPI.js";
 import {
   platforms as platformsArr,
   gameModes as gameModesArr,
@@ -52,6 +52,8 @@ const existingNewReview = () =>
       };
 
 function AddGame() {
+  const [existingGames, setExistingGames] = useState([]);
+  const [filteredGames, setFilteredGames] = useState([]);
   const [title, setTitle] = useState(existingTitle());
   const [image, setImage] = useState(existingImage());
   const [genre, setGenre] = useState(existingGenre());
@@ -65,10 +67,29 @@ function AddGame() {
 
   const [loading, setLoading] = useState(false);
 
+  // get existing games
+  useEffect(() => {
+    const fetchGames = async () => {
+      const videoGames = await getVideoGames();
+      setExistingGames(videoGames);
+    };
+    fetchGames();
+  }, []);
+
   // save to local storage when fields change
   useEffect(() => {
     localStorage.setItem("title", JSON.stringify(title));
-  }, [title]);
+
+    // filter games by title
+    if (title.trim() === "") {
+      setFilteredGames(existingGames);
+    } else {
+      const filtered = existingGames.filter((videoGame) =>
+        videoGame.name.toLowerCase().startsWith(title.toLowerCase())
+      );
+      setFilteredGames(filtered);
+    }
+  }, [existingGames, title]);
   useEffect(() => {
     localStorage.setItem("image", JSON.stringify(image));
   }, [image]);
@@ -96,6 +117,23 @@ function AddGame() {
   useEffect(() => {
     localStorage.setItem("newReview", JSON.stringify(newReview));
   }, [newReview]);
+
+  function handleGameClick(game) {
+    setTitle(game.title);
+    setImage(game.image);
+    setGenre(game.genre);
+    setDevelopers(game.developers);
+    setPlatforms(game.platforms);
+    setGameModes(game.gameModes);
+    setReleaseYear(game.releaseYear);
+    setAverageRating(game.averageRating);
+    setReviews(game.reviews);
+    setNewReview({
+      reviewerName: "",
+      rating: "1",
+      comment: "",
+    });
+  }
 
   function handleDevelopersChange(event) {
     const input = event.target.value;
@@ -125,8 +163,6 @@ function AddGame() {
     }
 
     setPlatforms(currPlatforms);
-
-    localStorage.setItem("platforms", JSON.stringify(currPlatforms));
   }
 
   function handleGameModesChange(event) {
@@ -160,31 +196,34 @@ function AddGame() {
     }));
   }
 
-  function handleSaveReview() {
-    if (!newReview.reviewerName || !newReview.rating || !newReview.comment) {
-      return;
-    }
-    setReviews((prev) => [...prev, newReview]);
-
-    // calculate average rating of reviews on the fly (if there contains reviews)
+  // function that calculates average rating of reviews on the fly (if there contains reviews)
+  function calculateAverageRating(currReviews) {
     let avgRating = 0;
-    if (reviews.length > 0) {
+    if (currReviews.length > 0) {
       avgRating = (
-        reviews
+        currReviews
           .map((review) => parseFloat(review.rating))
           .reduce((accumulator, currentValue) => {
             return accumulator + currentValue;
           }, 0) / reviews.length
       ).toFixed(1);
     }
-    setAverageRating(avgRating);
-
-    setNewReview({ reviewerName: "", rating: "1", comment: "" });
+    return avgRating;
   }
 
   // called when the form is submitted (with all required fields)
   async function handleSubmit(event) {
     event.preventDefault();
+
+    // handle adding the new review
+    if (!newReview.reviewerName || !newReview.rating || !newReview.comment) {
+      return;
+    }
+    const currReviews = [...reviews, newReview];
+    setReviews(currReviews);
+
+    const avgRating = calculateAverageRating(currReviews);
+    setAverageRating(avgRating);
 
     // Construct form data to be submitted
     const videoGameFormData = {
@@ -194,8 +233,9 @@ function AddGame() {
       platforms,
       gameModes,
       releaseYear: parseInt(releaseYear),
-      averageRating,
+      averageRating: avgRating,
       reviews,
+      newReview,
     };
 
     setLoading(true);
@@ -217,15 +257,6 @@ function AddGame() {
     setReleaseYear("2016");
     setAverageRating(0);
     setReviews([]);
-    setNewReview({
-      reviewerName: "",
-      rating: "1",
-      comment: "",
-    });
-  }
-
-  // function to clear/reset the review fields
-  function clearReviewFields() {
     setNewReview({
       reviewerName: "",
       rating: "1",
@@ -258,6 +289,17 @@ function AddGame() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
+          <div className="mt-2 flex flex-col items-center justify-center">
+            {existingGames.map((existingGame) => (
+              <div
+                key={existingGame.id}
+                className="p-2.5 border border-solid border-gray-400 hover:bg-gray-200 rounded-md cursor-pointer bg-[#f9f9f9] w-full text-center my-1"
+                onClick={() => handleGameClick(existingGame)}
+              >
+                {existingGame.title}
+              </div>
+            ))}
+          </div>
         </div>
 
         <div>
@@ -483,7 +525,7 @@ function AddGame() {
               name="rating"
               min="1"
               max="5"
-              step="0.1"
+              step="0.01"
               value={newReview.rating}
               onChange={(e) => handleNewReviewChange(e)}
               className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
@@ -504,23 +546,6 @@ function AddGame() {
               value={newReview.comment}
               onChange={(e) => handleNewReviewChange(e)}
             ></textarea>
-
-            <div className="flex justify-between mt-6">
-              <button
-                type="button"
-                className="px-3 py-2 mt-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer"
-                onClick={handleSaveReview}
-              >
-                Save Review
-              </button>
-              <button
-                type="button"
-                className="px-3 py-2 mt-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer"
-                onClick={clearReviewFields}
-              >
-                Cancel
-              </button>
-            </div>
           </div>
         </div>
 

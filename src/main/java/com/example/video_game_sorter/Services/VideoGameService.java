@@ -22,6 +22,11 @@ public class VideoGameService {
         return existingVideoGames; // return empty list if no video games
     }
 
+    public List<VideoGame> filterVideoGames(List<String> genres, List<String> platforms, List<String> gameModes) {
+        List<VideoGame> existingVideoGames = videoGameRepository.findByGenresPlatformsAndGameModes(genres, platforms, gameModes);
+        return existingVideoGames;
+    }
+
     public VideoGame getVideoGame(Long id) {
         VideoGame existingVideoGame = videoGameRepository.findById(id)
         .orElseThrow(() -> new VideoGameNotFoundException("Video game not found for id: " + id));

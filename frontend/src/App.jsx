@@ -5,6 +5,7 @@ import Games from "./pages/Games";
 import GameDetails from "./pages/GameDetails";
 import AddGame from "./pages/AddGame";
 import EditGame from "./pages/EditGame";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -12,9 +13,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/games" element={<Games />} />
-        <Route path="/games/:id" element={<GameDetails />} />
+        <Route path="/games/:id/details" element={<GameDetails />} />
         <Route path="/games/new" element={<AddGame />} />
         <Route path="/games/:id/edit" element={<EditGame />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
