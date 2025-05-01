@@ -7,11 +7,15 @@ import org.springframework.stereotype.Service;
 
 import com.example.video_game_sorter.Exceptions.VideoGame.VideoGameAlreadyExistsException;
 import com.example.video_game_sorter.Exceptions.VideoGame.VideoGameNotFoundException;
+import com.example.video_game_sorter.Models.Review;
 import com.example.video_game_sorter.Models.VideoGame;
 import com.example.video_game_sorter.Repo.VideoGameRepo;
 
+import jakarta.transaction.Transactional;
+
 // This class interacts with the video game repository
 @Service
+@Transactional
 public class VideoGameService {
     
     @Autowired
@@ -30,8 +34,20 @@ public class VideoGameService {
     }
 
     public void addVideoGame(VideoGame videoGame) {
+        if (videoGame == null) {
+            throw new IllegalArgumentException("Video game cannot be null.");
+        }
+        
         if (videoGameRepository.existsById(videoGame.getId())) {
             throw new VideoGameAlreadyExistsException("Video game already exists!");
+        }
+    
+        if (videoGame.getReviews() != null) {
+            for (Review review : videoGame.getReviews()) {
+                if (review != null) {
+                    review.setVideoGame(videoGame);
+                }
+            }
         }
         videoGameRepository.save(videoGame);
     }

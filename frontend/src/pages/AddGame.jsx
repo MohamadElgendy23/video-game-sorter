@@ -205,7 +205,7 @@ function AddGame() {
           .map((review) => parseFloat(review.rating))
           .reduce((accumulator, currentValue) => {
             return accumulator + currentValue;
-          }, 0) / reviews.length
+          }, 0) / currReviews.length
       ).toFixed(1);
     }
     return avgRating;
@@ -234,8 +234,7 @@ function AddGame() {
       gameModes,
       releaseYear: parseInt(releaseYear),
       averageRating: avgRating,
-      reviews,
-      newReview,
+      reviews: currReviews,
     };
 
     setLoading(true);
@@ -290,15 +289,17 @@ function AddGame() {
             onChange={(e) => setTitle(e.target.value)}
           />
           <div className="mt-2 flex flex-col items-center justify-center">
-            {existingGames.map((existingGame) => (
-              <div
-                key={existingGame.id}
-                className="p-2.5 border border-solid border-gray-400 hover:bg-gray-200 rounded-md cursor-pointer bg-[#f9f9f9] w-full text-center my-1"
-                onClick={() => handleGameClick(existingGame)}
-              >
-                {existingGame.title}
-              </div>
-            ))}
+            {filteredGames && filteredGames.length
+              ? filteredGames.map((filteredGame) => (
+                  <div
+                    key={filteredGame.id}
+                    className="p-2.5 border border-solid border-gray-400 hover:bg-gray-200 rounded-md cursor-pointer bg-[#f9f9f9] w-full text-center my-1"
+                    onClick={() => handleGameClick(filteredGame)}
+                  >
+                    {filteredGame.title}
+                  </div>
+                ))
+              : []}
           </div>
         </div>
 

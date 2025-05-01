@@ -1,5 +1,5 @@
 package com.example.video_game_sorter.Models;
-import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
@@ -36,7 +36,7 @@ public class VideoGame {
         joinColumns = @JoinColumn(name="video_game_id")
     )
     @Column(name = "developer")
-    private ArrayList<String> developers;
+    private List<String> developers;
 
     @ElementCollection
     @CollectionTable(
@@ -44,7 +44,7 @@ public class VideoGame {
         joinColumns = @JoinColumn(name="video_game_id")
     )
     @Column(name = "platform")
-    private ArrayList<String> platforms;  
+    private List<String> platforms;  
 
     @ElementCollection
     @CollectionTable(
@@ -52,7 +52,7 @@ public class VideoGame {
         joinColumns = @JoinColumn(name="video_game_id")
     )
     @Column(name="game_mode")
-    private ArrayList<String> gameModes;   
+    private List<String> gameModes;   
 
     @Column
     private int releaseYear;
@@ -61,7 +61,7 @@ public class VideoGame {
     private double averageRating; 
     
     @OneToMany(mappedBy = "videoGame", cascade = CascadeType.ALL, orphanRemoval = true)
-    private ArrayList<Review> reviews;     
+    private List<Review> reviews;     
 
     // Getter and setter methods
     public long getId() {
@@ -89,22 +89,22 @@ public class VideoGame {
     public void setGenre(String genre) {
         this.genre = genre;
     }
-    public ArrayList<String> getDevelopers() {
+    public List<String> getDevelopers() {
         return developers;
     }
-    public void setDevelopers(ArrayList<String> developers) {
+    public void setDevelopers(List<String> developers) {
         this.developers = developers;
     }
-    public ArrayList<String> getPlatforms() {
+    public List<String> getPlatforms() {
         return platforms;
     }
-    public void setPlatforms(ArrayList<String> platforms) {
+    public void setPlatforms(List<String> platforms) {
         this.platforms = platforms;
     }
-    public ArrayList<String> getGameModes() {
+    public List<String> getGameModes() {
         return gameModes;
     }
-    public void setGameModes(ArrayList<String> gameModes) {
+    public void setGameModes(List<String> gameModes) {
         this.gameModes = gameModes;
     }
     public int getReleaseYear() {
@@ -119,10 +119,10 @@ public class VideoGame {
     public void setAverageRating(double averageRating) {
         this.averageRating = averageRating;
     }
-    public ArrayList<Review> getReviews() {
+    public List<Review> getReviews() {
         return reviews;
     }
-    public void setReviews(ArrayList<Review> reviews) {
+    public void setReviews(List<Review> reviews) {
         this.reviews = reviews;
     }
 

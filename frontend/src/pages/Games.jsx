@@ -26,7 +26,7 @@ function Games() {
       });
   }, []);
 
-  // games is now computed on the fly based on allGames, query, activeGenre, activePlatform, and activeGameMode
+  // games is now computed on the fly based on allGames, debouncedQuery, activeGenre, activePlatform, and activeGameMode
   const games = useMemo(() => {
     return allGames.filter((videoGame) => {
       const matchesQuery =
