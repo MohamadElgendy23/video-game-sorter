@@ -1,6 +1,8 @@
 package com.example.video_game_sorter.Models;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -61,6 +63,7 @@ public class VideoGame {
     private double averageRating; 
     
     @OneToMany(mappedBy = "videoGame", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Review> reviews;     
 
     // Getter and setter methods

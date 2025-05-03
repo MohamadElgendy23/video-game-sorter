@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getVideoGames, addVideoGame } from "../api/videoGameAPI.js";
+import { getVideoGames, addVideoGame, deleteAllVideoGames } from "../api/videoGameAPI.js";
 import {
   platforms as platformsArr,
   gameModes as gameModesArr,
@@ -71,6 +71,7 @@ function AddGame() {
   useEffect(() => {
     const fetchGames = async () => {
       const videoGames = await getVideoGames();
+      console.log(videoGames);
       setExistingGames(videoGames);
     };
     fetchGames();
@@ -80,12 +81,20 @@ function AddGame() {
   useEffect(() => {
     localStorage.setItem("title", JSON.stringify(title));
 
+    if (!Array.isArray(existingGames)) {
+      setFilteredGames([]);
+      return;
+    }
+
     // filter games by title
     if (title.trim() === "") {
       setFilteredGames(existingGames);
     } else {
-      const filtered = existingGames.filter((videoGame) =>
-        videoGame.name.toLowerCase().startsWith(title.toLowerCase())
+      const filtered = existingGames.filter(
+        (videoGame) =>
+          videoGame &&
+          videoGame.title &&
+          videoGame.title.toLowerCase().startsWith(title.toLowerCase())
       );
       setFilteredGames(filtered);
     }
@@ -139,7 +148,6 @@ function AddGame() {
     const input = event.target.value;
     const developers = input.split(",").map((developer) => developer.trim());
     setDevelopers(developers);
-    localStorage.setItem("developers", JSON.stringify(developers));
   }
 
   function handlePlatformsChange(event) {
@@ -262,38 +270,69 @@ function AddGame() {
       comment: "",
     });
   }
+  
+  // function to delete all games from the database
+  async function handleDeleteAllGames() {
+    if (window.confirm("Are you sure you want to delete ALL games? This action cannot be undone.")) {
+      setLoading(true);
+      const result = await deleteAllVideoGames();
+      alert(result);
+      setLoading(false);
+      // Refresh the games list
+      const videoGames = await getVideoGames();
+      setExistingGames(videoGames || []);
+      setFilteredGames(videoGames || []);
+    }
+  }
 
   return (
-    <section className="py-10 px-6 flex justify-center items-center flex-col">
-      <h2 className="text-5xl text-white font-semibold text-center mb-10">
+    <section className="py-10 px-6 flex justify-center items-center flex-col bg-gradient-to-b from-gray-900 to-indigo-900 min-h-screen">
+      <h2 className="text-5xl text-white font-bold text-center mb-10 drop-shadow-lg">
         Add New Video Game
       </h2>
       <form
-        className="p-4 space-y-4 bg-[#f2f2f2] shadow-md w-1/3 rounded-md"
+        className="p-8 space-y-6 bg-white shadow-xl w-full max-w-2xl rounded-lg border border-indigo-100"
         onSubmit={handleSubmit}
       >
-        <div>
+        <div className="relative">
           <label
             htmlFor="title"
-            className="block text-sm font-extrabold text-gray-700 text-center lg:text-start"
+            className="block text-sm font-bold text-indigo-700 mb-2"
           >
             Game Title
           </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
-            required
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <div className="mt-2 flex flex-col items-center justify-center">
-            {filteredGames && filteredGames.length
+          <div className="relative">
+            <input
+              type="text"
+              id="title"
+              name="title"
+              className="block w-full p-4 pl-4 border border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+              required
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Search or enter game title..."
+            />
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <svg
+                className="w-5 h-5 text-indigo-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                  clipRule="evenodd"
+                ></path>
+              </svg>
+            </div>
+          </div>
+          <div className="mt-2 flex flex-col items-center justify-center max-h-60 overflow-y-auto">
+            {Array.isArray(filteredGames) && filteredGames.length > 0
               ? filteredGames.map((filteredGame) => (
                   <div
                     key={filteredGame.id}
-                    className="p-2.5 border border-solid border-gray-400 hover:bg-gray-200 rounded-md cursor-pointer bg-[#f9f9f9] w-full text-center my-1"
+                    className="p-3 border border-indigo-200 hover:bg-indigo-50 rounded-lg cursor-pointer bg-white w-full text-center my-1 transition-colors duration-200 shadow-sm"
                     onClick={() => handleGameClick(filteredGame)}
                   >
                     {filteredGame.title}
@@ -306,80 +345,129 @@ function AddGame() {
         <div>
           <label
             htmlFor="image"
-            className="block text-sm font-extrabold text-gray-700 text-center lg:text-start"
+            className="block text-sm font-bold text-indigo-700 mb-2"
           >
             Image (URL)
           </label>
-          {/* <input
-            type="file"
-            id="image"
-            name="image"
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
-            required
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
-            accept="image/png, image/jpeg"
-          /> */}
-          <input
-            type="text"
-            id="image"
-            name="image"
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
-            required
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
-          />
+          <div className="relative">
+            <input
+              type="text"
+              id="image"
+              name="image"
+              className="block w-full p-4 pl-4 border border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+              required
+              value={image}
+              onChange={(e) => setImage(e.target.value)}
+              placeholder="Enter image URL..."
+            />
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <svg
+                className="w-5 h-5 text-indigo-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                  clipRule="evenodd"
+                ></path>
+              </svg>
+            </div>
+          </div>
+          {image && (
+            <div className="mt-4 p-2 bg-gray-50 rounded-lg border border-indigo-100 shadow-inner">
+              <img
+                src={image}
+                alt="Game preview"
+                className="max-h-60 mx-auto rounded-md object-contain"
+                onError={(e) => {
+                  e.target.style.display = "none";
+                  e.target.parentNode.innerHTML +=
+                    '<div class="p-4 text-center text-red-500">Image could not be loaded</div>';
+                }}
+              />
+            </div>
+          )}
         </div>
 
         <div>
           <label
             htmlFor="genre"
-            className="block text-sm font-extrabold text-gray-700 text-center lg:text-start"
+            className="block text-sm font-bold text-indigo-700 mb-2"
           >
             Genre
           </label>
-          <select
-            id="genre"
-            name="genre"
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
-            required
-            value={genre}
-            onChange={(e) => setGenre(e.target.value)}
-          >
-            <option value="">Select a genre</option>
-            <option value="Puzzle">Puzzle</option>
-            <option value="Adventure">Adventure</option>
-            <option value="RPG">RPG</option>
-            <option value="MMORPG">MMORPG</option>
-            <option value="Shooter">Shooter</option>
-            <option value="Stealth">Stealth</option>
-            <option value="Racing">Racing</option>
-            <option value="Sports">Sports</option>
-            <option value="Simulation">Simulation</option>
-            <option value="Strategy">Strategy</option>
-            <option value="MOBA">MOBA</option>
-            <option value="Survival">Survival</option>
-            <option value="Horror">Horror</option>
-          </select>
+          <div className="relative">
+            <select
+              id="genre"
+              name="genre"
+              className="block w-full p-4 pl-4 border border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 appearance-none bg-white"
+              required
+              value={genre}
+              onChange={(e) => setGenre(e.target.value)}
+            >
+              <option value="">Select a genre</option>
+              <option value="Puzzle">Puzzle</option>
+              <option value="Adventure">Adventure</option>
+              <option value="RPG">RPG</option>
+              <option value="MMORPG">MMORPG</option>
+              <option value="Shooter">Shooter</option>
+              <option value="Stealth">Stealth</option>
+              <option value="Racing">Racing</option>
+              <option value="Sports">Sports</option>
+              <option value="Simulation">Simulation</option>
+              <option value="Strategy">Strategy</option>
+              <option value="MOBA">MOBA</option>
+              <option value="Survival">Survival</option>
+              <option value="Horror">Horror</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-indigo-500">
+              <svg
+                className="w-5 h-5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                ></path>
+              </svg>
+            </div>
+          </div>
         </div>
 
         <div>
           <label
             htmlFor="developers"
-            className="block text-sm font-extrabold text-gray-700 text-center lg:text-start"
+            className="block text-sm font-bold text-indigo-700 mb-2"
           >
             Developers
           </label>
-          <input
-            type="text"
-            id="developers"
-            name="developers"
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md"
-            required
-            placeholder="Enter developer names, separated by commas"
-            value={developers}
-            onChange={(e) => handleDevelopersChange(e)}
-          />
+          <div className="relative">
+            <input
+              type="text"
+              id="developers"
+              name="developers"
+              className="block w-full p-4 pl-4 border border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+              required
+              placeholder="Enter developer names, separated by commas"
+              value={developers}
+              onChange={(e) => handleDevelopersChange(e)}
+            />
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <svg
+                className="w-5 h-5 text-indigo-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path>
+              </svg>
+            </div>
+          </div>
         </div>
 
         <div>
@@ -550,20 +638,92 @@ function AddGame() {
           </div>
         </div>
 
-        <div className="flex justify-between mt-6">
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer"
-          >
-            {loading ? "Saving..." : "Save Game"}
-          </button>
+        <div className="flex flex-col gap-4 mt-8">
+          <div className="flex justify-between space-x-4">
+            <button
+              type="button"
+              className="flex-1 px-6 py-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 font-medium shadow-sm border border-gray-300 cursor-pointer"
+              onClick={clearFormFields}
+            >
+              <span className="flex items-center justify-center">
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  ></path>
+                </svg>
+                Cancel
+              </span>
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 px-6 py-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all duration-200 font-medium shadow-md disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+            >
+              <span className="flex items-center justify-center">
+                {loading ? (
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                    Save Game
+                  </>
+                )}
+              </span>
+            </button>
+          </div>
+          
           <button
             type="button"
-            className="px-6 py-3 bg-gray-500 text-white rounded-md hover:bg-gray-600 cursor-pointer"
-            onClick={clearFormFields}
+            onClick={handleDeleteAllGames}
+            disabled={loading}
+            className="w-full px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-medium shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            Cancel
+            <span className="flex items-center justify-center">
+              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd"></path>
+              </svg>
+              Delete All Games
+            </span>
           </button>
         </div>
       </form>

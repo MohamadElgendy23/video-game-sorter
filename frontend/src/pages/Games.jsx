@@ -19,7 +19,12 @@ function Games() {
     setLoading(true);
     getVideoGames()
       .then((videoGames) => {
-        setAllGames(videoGames);
+        // Ensure videoGames is an array before setting state
+        setAllGames(Array.isArray(videoGames) ? videoGames : []);
+      })
+      .catch((error) => {
+        console.error("Error fetching video games:", error);
+        setAllGames([]);
       })
       .finally(() => {
         setLoading(false);
@@ -28,25 +33,38 @@ function Games() {
 
   // games is now computed on the fly based on allGames, debouncedQuery, activeGenre, activePlatform, and activeGameMode
   const games = useMemo(() => {
+    // Ensure allGames is an array before filtering
+    if (!Array.isArray(allGames)) {
+      return [];
+    }
+
     return allGames.filter((videoGame) => {
+      // Safety check for videoGame object
+      if (!videoGame) return false;
+
       const matchesQuery =
         debouncedQuery === "" ||
-        videoGame.title.toLowerCase().startsWith(debouncedQuery.toLowerCase());
+        (videoGame.title &&
+          videoGame.title
+            .toLowerCase()
+            .startsWith(debouncedQuery.toLowerCase()));
 
       const matchesGenres =
         activeGenre === "All" || activeGenre === videoGame.genre;
 
       const matchesPlatforms =
         activePlatform[0] === "All" ||
-        activePlatform.some((platform) =>
-          videoGame.platforms.includes(platform)
-        );
+        (Array.isArray(videoGame.platforms) &&
+          activePlatform.some((platform) =>
+            videoGame.platforms.includes(platform)
+          ));
 
       const matchesGameModes =
         activeGameMode[0] === "Single-player" ||
-        activeGameMode.some((gameMode) =>
-          videoGame.gameModes.includes(gameMode)
-        );
+        (Array.isArray(videoGame.gameModes) &&
+          activeGameMode.some((gameMode) =>
+            videoGame.gameModes.includes(gameMode)
+          ));
 
       return (
         matchesQuery && matchesGenres && matchesPlatforms && matchesGameModes
@@ -55,8 +73,8 @@ function Games() {
   }, [allGames, debouncedQuery, activeGenre, activePlatform, activeGameMode]);
 
   return (
-    <section className="flex flex-col items-center py-10 px-6">
-      <h2 className="text-5xl font-bold text-white text-center mb-7">
+    <section className="flex flex-col items-center py-10 px-6 bg-gradient-to-b from-gray-900 to-indigo-900 min-h-screen">
+      <h2 className="text-5xl font-bold text-white text-center mb-7 drop-shadow-lg">
         Browse Games by Category
       </h2>
       <div className="text-center mb-7">
@@ -195,66 +213,128 @@ function Games() {
         <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-64">
           <div className="w-16 h-16 border-4 border-indigo-300 border-t-transparent rounded-full animate-spin"></div>
         </div>
-      ) : games && games.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      ) : Array.isArray(games) && games.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8 w-full max-w-7xl">
           {games.map((game) => (
             <div
               key={game.id}
-              className="bg-white shadow-md p-4 rounded-lg cursor-pointer"
-              onClick={() => navigate(`/games/${game.id}/details`)}
+              className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden flex flex-col h-full transform hover:-translate-y-1 cursor-pointer"
+              onClick={(e) => {
+                // Prevent navigation if clicking on the button
+                if (e.target.tagName !== 'BUTTON') {
+                  navigate(`/games/${game.id}/details`);
+                }
+              }}
             >
-              <h3 className="text-xl font-semibold">{game.title}</h3>
-              <img className="" src={game.image} alt="Video game image" />
-              <p className="text-sm text-gray-600">{game.genre}</p>
-              <p className="text-sm text-gray-600">{game.releaseYear}</p>
-              <p className="text-sm text-gray-600">{game.averageRating}</p>
-              <div className="mt-2">
-                {game.developers.map((developer) => (
-                  <p key={developer} className="text-sm text-gray-600">
-                    {developer}
-                  </p>
-                ))}
+              {/* Game Image with Fallback */}
+              <div className="relative w-full h-48 bg-gray-200 overflow-hidden">
+                {game.image ? (
+                  <img 
+                    className="w-full h-full object-cover" 
+                    src={game.image} 
+                    alt={`${game.title} cover`}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "https://placehold.co/600x400?text=No+Image";
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                    <span className="text-gray-400">No image available</span>
+                  </div>
+                )}
+                
+                {/* Rating Badge */}
+                {game.averageRating > 0 && (
+                  <div className="absolute top-3 right-3 bg-yellow-400 text-gray-900 font-bold rounded-full w-10 h-10 flex items-center justify-center shadow-md">
+                    {game.averageRating}
+                  </div>
+                )}
               </div>
-              <div className="mt-2">
-                {game.platforms.map((platform) => (
-                  <p key={platform} className="text-sm text-gray-600">
-                    {platform}
-                  </p>
-                ))}
-              </div>
-              <div className="mt-2">
-                {game.gameModes.map((gameMode) => (
-                  <p key={gameMode} className="text-sm text-gray-600">
-                    {gameMode}
-                  </p>
-                ))}
-              </div>
-              <div className="mt-2">
-                {game.reviews.map((review, index) => (
-                  <div
-                    key={index}
-                    className="border rounded-xl p-4 shadow-sm bg-white dark:bg-gray-900"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-semibold text-gray-800 dark:text-gray-100">
-                        {review.reviewerName}
-                      </h4>
-                      <span className="text-sm text-yellow-500">
-                        ⭐ {review.rating}/5
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
-                      {review.comment}
+              
+              {/* Game Info */}
+              <div className="p-5 flex-grow flex flex-col">
+                <h3 className="text-xl font-bold text-gray-800 mb-2 line-clamp-2">{game.title}</h3>
+                
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs font-medium rounded">
+                    {game.genre}
+                  </span>
+                  <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded">
+                    {game.releaseYear}
+                  </span>
+                </div>
+                
+                {/* Developers */}
+                {game.developers && game.developers.length > 0 && (
+                  <div className="mb-3">
+                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">Developers</p>
+                    <p className="text-sm text-gray-700 font-medium">
+                      {game.developers.join(", ")}
                     </p>
                   </div>
-                ))}
+                )}
+                
+                {/* Platforms */}
+                {game.platforms && game.platforms.length > 0 && (
+                  <div className="mb-3">
+                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">Platforms</p>
+                    <div className="flex flex-wrap gap-1">
+                      {game.platforms.map((platform) => (
+                        <span key={platform} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                          {platform}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Game Modes - Collapsed */}
+                {game.gameModes && game.gameModes.length > 0 && (
+                  <div className="mb-3">
+                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">Game Modes</p>
+                    <div className="flex flex-wrap gap-1">
+                      {game.gameModes.slice(0, 3).map((mode) => (
+                        <span key={mode} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                          {mode}
+                        </span>
+                      ))}
+                      {game.gameModes.length > 3 && (
+                        <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                          +{game.gameModes.length - 3} more
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                {/* Reviews Summary */}
+                {game.reviews && game.reviews.length > 0 && (
+                  <div className="mt-auto">
+                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">Reviews</p>
+                    <p className="text-sm text-gray-600">
+                      {game.reviews.length} {game.reviews.length === 1 ? 'review' : 'reviews'}
+                    </p>
+                  </div>
+                )}
               </div>
-              <button
-                className="mt-3 text-indigo-600 hover:underline"
-                onClick={() => navigate(`/games/${game.id}`)}
-              >
-                View Details
-              </button>
+              
+              {/* Action Button */}
+              <div className="px-5 pb-5 pt-2 border-t border-gray-100">
+                <button
+                  className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors duration-200 flex items-center justify-center"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/games/${game.id}/details`);
+                  }}
+                >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                  View Details
+                </button>
+              </div>
             </div>
           ))}
         </div>

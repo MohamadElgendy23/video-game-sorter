@@ -11,6 +11,7 @@ export async function getVideoGames() {
     return data;
   } catch (error) {
     console.error("Error fetching data:", error);
+    return [];
   }
 }
 
@@ -33,5 +34,33 @@ export async function addVideoGame(newGame) {
     return data;
   } catch (error) {
     console.error("Error creating data:", error);
+  }
+}
+
+// function to delete a video game by id
+export async function deleteVideoGame(id) {
+  try {
+    const response = await axios.delete(`${baseURL}/${id}`);
+    const data = response.data;
+    return data;
+  } catch (error) {
+    console.error("Error deleting game:", error);
+  }
+}
+
+// function to delete all video games
+export async function deleteAllVideoGames() {
+  try {
+    const games = await getVideoGames();
+    if (!Array.isArray(games) || games.length === 0) {
+      return "No games to delete";
+    }
+    
+    const deletePromises = games.map(game => deleteVideoGame(game.id));
+    await Promise.all(deletePromises);
+    return "All games deleted successfully";
+  } catch (error) {
+    console.error("Error deleting all games:", error);
+    return "Failed to delete all games";
   }
 }
