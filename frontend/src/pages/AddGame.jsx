@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { getVideoGames, addVideoGame, deleteAllVideoGames } from "../api/videoGameAPI.js";
+import {
+  getVideoGames,
+  addVideoGame,
+  deleteAllVideoGames,
+} from "../api/videoGameAPI.js";
 import {
   platforms as platformsArr,
   gameModes as gameModesArr,
@@ -55,7 +59,8 @@ function AddGame() {
   const [existingGames, setExistingGames] = useState([]);
   const [filteredGames, setFilteredGames] = useState([]);
   const [title, setTitle] = useState(existingTitle());
-  const [image, setImage] = useState(existingImage());
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(existingImage());
   const [genre, setGenre] = useState(existingGenre());
   const [developers, setDevelopers] = useState(existingDevelopers());
   const [platforms, setPlatforms] = useState(existingPlatforms());
@@ -71,7 +76,6 @@ function AddGame() {
   useEffect(() => {
     const fetchGames = async () => {
       const videoGames = await getVideoGames();
-      console.log(videoGames);
       setExistingGames(videoGames);
     };
     fetchGames();
@@ -100,8 +104,8 @@ function AddGame() {
     }
   }, [existingGames, title]);
   useEffect(() => {
-    localStorage.setItem("image", JSON.stringify(image));
-  }, [image]);
+    localStorage.setItem("image", JSON.stringify(imagePreview));
+  }, [imagePreview]);
   useEffect(() => {
     localStorage.setItem("genre", JSON.stringify(genre));
   }, [genre]);
@@ -129,7 +133,8 @@ function AddGame() {
 
   function handleGameClick(game) {
     setTitle(game.title);
-    setImage(game.image);
+    setImagePreview(game.image);
+    setImageFile(null);
     setGenre(game.genre);
     setDevelopers(game.developers);
     setPlatforms(game.platforms);
@@ -142,6 +147,21 @@ function AddGame() {
       rating: "1",
       comment: "",
     });
+  }
+  
+  function handleImageChange(event) {
+    const file = event.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setImageFile(null);
+      setImagePreview("");
+    }
   }
 
   function handleDevelopersChange(event) {
@@ -236,6 +256,7 @@ function AddGame() {
     // Construct form data to be submitted
     const videoGameFormData = {
       title,
+      image: imagePreview, // Use the image preview data URL
       genre,
       developers,
       platforms,
@@ -256,7 +277,8 @@ function AddGame() {
   // function to clear/reset the form fields
   function clearFormFields() {
     setTitle("");
-    setImage("");
+    setImageFile(null);
+    setImagePreview("");
     setGenre("");
     setDevelopers([]);
     setPlatforms([]);
@@ -270,10 +292,14 @@ function AddGame() {
       comment: "",
     });
   }
-  
+
   // function to delete all games from the database
   async function handleDeleteAllGames() {
-    if (window.confirm("Are you sure you want to delete ALL games? This action cannot be undone.")) {
+    if (
+      window.confirm(
+        "Are you sure you want to delete ALL games? This action cannot be undone."
+      )
+    ) {
       setLoading(true);
       const result = await deleteAllVideoGames();
       alert(result);
@@ -347,38 +373,46 @@ function AddGame() {
             htmlFor="image"
             className="block text-sm font-bold text-indigo-700 mb-2"
           >
-            Image (URL)
+            Game Image
           </label>
-          <div className="relative">
-            <input
-              type="text"
-              id="image"
-              name="image"
-              className="block w-full p-4 pl-4 border border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
-              required
-              value={image}
-              onChange={(e) => setImage(e.target.value)}
-              placeholder="Enter image URL..."
-            />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <svg
-                className="w-5 h-5 text-indigo-500"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
-            </div>
+          <div className="flex items-center justify-center w-full">
+            <label
+              htmlFor="image-upload"
+              className="flex flex-col items-center justify-center w-full h-32 border-2 border-indigo-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all duration-200"
+            >
+              <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                <svg
+                  className="w-10 h-10 mb-3 text-indigo-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                  ></path>
+                </svg>
+                <p className="mb-2 text-sm text-indigo-600">
+                  <span className="font-semibold">Click to upload</span> or drag and drop
+                </p>
+                <p className="text-xs text-gray-500">PNG, JPG or GIF (MAX. 5MB)</p>
+              </div>
+              <input
+                id="image-upload"
+                type="file"
+                className="hidden"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+            </label>
           </div>
-          {image && (
+          {imagePreview && (
             <div className="mt-4 p-2 bg-gray-50 rounded-lg border border-indigo-100 shadow-inner">
               <img
-                src={image}
+                src={imagePreview}
                 alt="Game preview"
                 className="max-h-60 mx-auto rounded-md object-contain"
                 onError={(e) => {
@@ -387,6 +421,19 @@ function AddGame() {
                     '<div class="p-4 text-center text-red-500">Image could not be loaded</div>';
                 }}
               />
+              <button
+                type="button"
+                onClick={() => {
+                  setImageFile(null);
+                  setImagePreview("");
+                }}
+                className="mt-2 px-3 py-1 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors text-sm flex items-center mx-auto"
+              >
+                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd"></path>
+                </svg>
+                Remove Image
+              </button>
             </div>
           )}
         </div>
@@ -711,16 +758,25 @@ function AddGame() {
               </span>
             </button>
           </div>
-          
+
           <button
             type="button"
             onClick={handleDeleteAllGames}
             disabled={loading}
-            className="w-full px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-medium shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-medium shadow-md disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
           >
             <span className="flex items-center justify-center">
-              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd"></path>
+              <svg
+                className="w-5 h-5 mr-2"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                ></path>
               </svg>
               Delete All Games
             </span>

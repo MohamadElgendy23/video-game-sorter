@@ -37,6 +37,17 @@ export async function addVideoGame(newGame) {
   }
 }
 
+// function to update a video game
+export async function updateVideoGame(id, updatedGame) {
+  try {
+    const response = await axios.put(`${baseURL}/${id}`, updatedGame);
+    const data = response.data;
+    return data;
+  } catch (error) {
+    console.error("Error updating game:", error);
+  }
+}
+
 // function to delete a video game by id
 export async function deleteVideoGame(id) {
   try {

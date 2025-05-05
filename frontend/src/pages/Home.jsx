@@ -5,7 +5,7 @@ function Home() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col justify-center items-center text-center w-full h-screen">
+    <div className="flex flex-col justify-center items-center text-center w-full h-screen bg-gradient-to-b from-gray-900 to-indigo-900">
       <h1 className="text-7xl font-bold text-white mt-7 drop-shadow-lg">
         Video Game Sorter
       </h1>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { genres, platforms, gameModes } from "../data/data.js";
 import { getVideoGames } from "../api/videoGameAPI.js";
@@ -12,6 +12,7 @@ function Games() {
   const [activeGameMode, setActiveGameMode] = useState(["Single-player"]);
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebouncedValue(query, 300);
+  const gamesContainerRef = useRef(null);
 
   const navigate = useNavigate();
 
@@ -71,6 +72,20 @@ function Games() {
       );
     });
   }, [allGames, debouncedQuery, activeGenre, activePlatform, activeGameMode]);
+
+  // Animation effect for game cards
+  useEffect(() => {
+    if (!loading && gamesContainerRef.current) {
+      const gameCards =
+        gamesContainerRef.current.querySelectorAll(".game-card");
+
+      gameCards.forEach((card, index) => {
+        setTimeout(() => {
+          card.classList.add("game-card-animated");
+        }, index * 100);
+      });
+    }
+  }, [loading, games]);
 
   return (
     <section className="flex flex-col items-center py-10 px-6 bg-gradient-to-b from-gray-900 to-indigo-900 min-h-screen">
@@ -214,14 +229,21 @@ function Games() {
           <div className="w-16 h-16 border-4 border-indigo-300 border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : Array.isArray(games) && games.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8 w-full max-w-7xl">
-          {games.map((game) => (
+        <div
+          ref={gamesContainerRef}
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8 w-full max-w-7xl"
+        >
+          {games.map((game, index) => (
             <div
               key={game.id}
-              className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden flex flex-col h-full transform hover:-translate-y-1 cursor-pointer"
+              className="game-card bg-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden flex flex-col h-full transform hover:-translate-y-1 cursor-pointer"
+              style={{
+                animationDelay: `${index * 100}ms`,
+                animationFillMode: "forwards",
+              }}
               onClick={(e) => {
                 // Prevent navigation if clicking on the button
-                if (e.target.tagName !== 'BUTTON') {
+                if (e.target.tagName !== "BUTTON") {
                   navigate(`/games/${game.id}/details`);
                 }
               }}
@@ -229,13 +251,14 @@ function Games() {
               {/* Game Image with Fallback */}
               <div className="relative w-full h-48 bg-gray-200 overflow-hidden">
                 {game.image ? (
-                  <img 
-                    className="w-full h-full object-cover" 
-                    src={game.image} 
+                  <img
+                    className="w-full h-full object-cover"
+                    src={game.image}
                     alt={`${game.title} cover`}
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = "https://placehold.co/600x400?text=No+Image";
+                      e.target.src =
+                        "https://placehold.co/600x400?text=No+Image";
                     }}
                   />
                 ) : (
@@ -243,7 +266,7 @@ function Games() {
                     <span className="text-gray-400">No image available</span>
                   </div>
                 )}
-                
+
                 {/* Rating Badge */}
                 {game.averageRating > 0 && (
                   <div className="absolute top-3 right-3 bg-yellow-400 text-gray-900 font-bold rounded-full w-10 h-10 flex items-center justify-center shadow-md">
@@ -251,11 +274,13 @@ function Games() {
                   </div>
                 )}
               </div>
-              
+
               {/* Game Info */}
               <div className="p-5 flex-grow flex flex-col">
-                <h3 className="text-xl font-bold text-gray-800 mb-2 line-clamp-2">{game.title}</h3>
-                
+                <h3 className="text-xl font-bold text-gray-800 mb-2 line-clamp-2">
+                  {game.title}
+                </h3>
+
                 <div className="flex items-center gap-2 mb-3">
                   <span className="px-2 py-1 bg-indigo-100 text-indigo-800 text-xs font-medium rounded">
                     {game.genre}
@@ -264,38 +289,50 @@ function Games() {
                     {game.releaseYear}
                   </span>
                 </div>
-                
+
                 {/* Developers */}
                 {game.developers && game.developers.length > 0 && (
                   <div className="mb-3">
-                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">Developers</p>
+                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">
+                      Developers
+                    </p>
                     <p className="text-sm text-gray-700 font-medium">
                       {game.developers.join(", ")}
                     </p>
                   </div>
                 )}
-                
+
                 {/* Platforms */}
                 {game.platforms && game.platforms.length > 0 && (
                   <div className="mb-3">
-                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">Platforms</p>
+                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">
+                      Platforms
+                    </p>
                     <div className="flex flex-wrap gap-1">
                       {game.platforms.map((platform) => (
-                        <span key={platform} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                        <span
+                          key={platform}
+                          className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded"
+                        >
                           {platform}
                         </span>
                       ))}
                     </div>
                   </div>
                 )}
-                
+
                 {/* Game Modes - Collapsed */}
                 {game.gameModes && game.gameModes.length > 0 && (
                   <div className="mb-3">
-                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">Game Modes</p>
+                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">
+                      Game Modes
+                    </p>
                     <div className="flex flex-wrap gap-1">
                       {game.gameModes.slice(0, 3).map((mode) => (
-                        <span key={mode} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                        <span
+                          key={mode}
+                          className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded"
+                        >
                           {mode}
                         </span>
                       ))}
@@ -307,33 +344,78 @@ function Games() {
                     </div>
                   </div>
                 )}
-                
+
                 {/* Reviews Summary */}
                 {game.reviews && game.reviews.length > 0 && (
                   <div className="mt-auto">
-                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">Reviews</p>
+                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">
+                      Reviews
+                    </p>
                     <p className="text-sm text-gray-600">
-                      {game.reviews.length} {game.reviews.length === 1 ? 'review' : 'reviews'}
+                      {game.reviews.length}{" "}
+                      {game.reviews.length === 1 ? "review" : "reviews"}
                     </p>
                   </div>
                 )}
               </div>
-              
-              {/* Action Button */}
+
+              {/* Action Buttons */}
               <div className="px-5 pb-5 pt-2 border-t border-gray-100">
-                <button
-                  className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors duration-200 flex items-center justify-center"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/games/${game.id}/details`);
-                  }}
-                >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                  </svg>
-                  View Details
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors duration-200 flex items-center justify-center cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/games/${game.id}/details`);
+                    }}
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      ></path>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      ></path>
+                    </svg>
+                    View
+                  </button>
+
+                  <button
+                    className="flex-1 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-colors duration-200 flex items-center justify-center cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/games/${game.id}/edit`);
+                    }}
+                  >
+                    <svg
+                      className="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      ></path>
+                    </svg>
+                    Edit
+                  </button>
+                </div>
               </div>
             </div>
           ))}
