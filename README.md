@@ -60,24 +60,16 @@ bash
 Copy
 Edit
 git clone https://github.com/MohamadElgendy23/video-game-sorter.git
+
 Install frontend dependencies:
 
-bash
-Copy
-Edit
 cd frontend
 npm install
+
 Start the frontend:
-
-bash
-Copy
-Edit
 npm run dev
-Set up the backend:
 
-bash
-Copy
-Edit
+Set up the backend:
 cd backend
 ./mvnw spring-boot:run
 
