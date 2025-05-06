@@ -42,3 +42,30 @@ The app uses modern technologies to create a seamless experience:
 1. Clone the repository:
    ```bash
    git clone https://github.com/MohamadElgendy23/video-game-sorter.git
+   
+2. Install frontend dependencies:
+cd frontend
+npm install
+
+3. Start the frontend development server:
+npm run dev
+
+4. Set up the backend:
+cd backend
+./mvnw spring-boot:run
+
+5. Configure PostgreSQL and Amazon Q settings according to the project’s configuration files.
+
+6. Open your browser and navigate to http://localhost:3000 to start using the app!
+
+Future Improvements
+User Profiles: Implement user authentication so users can save their favorite games and preferences.
+
+Advanced Sorting: Add more sorting options such as by developer or user reviews.
+
+Social Sharing: Allow users to share their game lists with others, making it easier to discover new games.
+
+
+
+
+
