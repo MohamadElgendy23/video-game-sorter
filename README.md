@@ -58,7 +58,7 @@ cd backend
 
 6. Open your browser and navigate to http://localhost:3000 to start using the app!
 
-Future Improvements:
+## Future Improvements:
 
 User Profiles: Implement user authentication so users can save their favorite games and preferences.
 
