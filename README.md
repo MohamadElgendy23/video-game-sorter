@@ -60,11 +60,11 @@ cd backend
 
 ## Future Improvements:
 
-User Profiles: Implement user authentication so users can save their favorite games and preferences.
+* User Profiles: Implement user authentication so users can save their favorite games and preferences.
 
-Advanced Sorting: Add more sorting options such as by developer or user reviews.
+* Advanced Sorting: Add more sorting options such as by developer or user reviews.
 
-Social Sharing: Allow users to share their game lists with others, making it easier to discover new games.
+* Social Sharing: Allow users to share their game lists with others, making it easier to discover new games.
 
 
 
