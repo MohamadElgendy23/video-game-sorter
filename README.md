@@ -52,30 +52,33 @@ PostgreSQL (for database management)
 
 Amazon Q (for advanced query processing)
 
+
 Steps to Set Up
 
 Clone the repo:
 
-bash
-Copy
-Edit
 git clone https://github.com/MohamadElgendy23/video-game-sorter.git
+
 
 Install frontend dependencies:
 
 cd frontend
 npm install
 
+
 Start the frontend:
 npm run dev
+
 
 Set up the backend:
 cd backend
 ./mvnw spring-boot:run
 
+
 Configure PostgreSQL and Amazon Q settings based on the project’s configuration files.
 
 Visit http://localhost:3000 in your browser to start using the app!
+
 
 Future Improvements
 
